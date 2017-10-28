@@ -1,0 +1,100 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Phaser - Making your first game, part 9</title>
+    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+
+    function preload () {
+
+        game.stage.backgroundColor = '#cfccd1';
+        game.load.image('player', 'assets/sprites/spinObj_01.png');
+
+    }
+
+    function create () {
+
+
+        //  Resize our game world to be a 2000 x 2000 square
+        game.world.setBounds(-1000, -1000, 2000, 2000);
+
+        //  The base of our player
+        player = game.add.sprite(0, 0, 'player');
+        player.anchor.setTo(0.5, 0.5);
+
+        //  This will force the player to decelerate and limit its speed
+        game.physics.enable(player, Phaser.Physics.ARCADE);
+        player.body.drag.set(0.2);
+        player.body.maxVelocity.setTo(400, 400);
+        player.body.collideWorldBounds = true;
+
+        player.bringToTop();
+
+
+        game.camera.follow(player);
+        game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+        game.camera.focusOnXY(0, 0);
+
+        cursors = game.input.keyboard.createCursorKeys();
+
+    }
+
+
+
+    var currentSpeed = 0;
+
+
+    function update () {
+
+        if (cursors.left.isDown)
+        {
+            player.angle -= 4;
+        }
+        else if (cursors.right.isDown)
+        {
+            player.angle += 4;
+        }
+
+        if (cursors.up.isDown)
+        {
+            //  The speed we'll travel at
+            currentSpeed = 300;
+        }
+        else
+        {
+            if (currentSpeed > 0)
+            {
+                currentSpeed -= 4;
+            }
+        }
+
+        if (currentSpeed > 0)
+        {
+            game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
+        }
+
+    }
+
+    function render () {
+
+
+    }
+
+
+
+</script>
+
+</body>
+</html>
