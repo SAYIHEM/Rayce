@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Phaser - Making your first game, part 1</title>
+    <title>Phaser - Making your first game, part 3</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <script src="Blackhole.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -18,19 +19,26 @@
 
     function preload() {
 
+//        game.load.image('sky', 'assets/sky.png');
+//        game.load.image('ground', 'assets/platform.png');
+        game.load.image('star', 'star.png');
+//        game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+
     }
 
     function create() {
 
+        console.log("Hello World");
 
+        var blackhole = new Blackhole(game.add.sprite(0, 0, 'star'));
 
+        blackhole.sprite..interact();
     }
 
     function update() {
-
     }
 
 </script>
 
 </body>
-</html>Title
+</html>
