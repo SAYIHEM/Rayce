@@ -1,11 +1,10 @@
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Phaser - Making your first game, part 3</title>
+    <title>Phaser - Making your first game, part 9</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
-    <script src="Blackhole.js"></script>
-    <script src="Player.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -16,50 +15,115 @@
 
 <script type="text/javascript">
 
-    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, });
-    var player;
+    var lineGroup;
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
     var blackholes;
 
-    function preload() {
+    function preload () {
 
         game.stage.backgroundColor = '#cfccd1';
-        game.load.image('sky', 'assets/sky.png');
-        game.load.image('ground', 'assets/platform.png');
-        game.load.image('star', 'assets/star.png');
+        //game.load.image('player', 'assets/sprites/spinObj_01.png');
+        game.load.image('player', 'assets/sprites/blue_ball.png');
+        game.load.image('circle', 'assets/sprites/block.png');
+        game.load.image('line', 'assets/sprites/vu.png');
         game.load.image('blackhole', 'assets/blackhole.png');
-        game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+
+
+        // particles
+        game.load.spritesheet('balls', 'assets/sprites/balls.png', 17, 17);
+        // font
+        game.load.bitmapFont('carrier_command', 'assets/fonts/bitmapFonts/carrier_command.png', 'assets/fonts/bitmapFonts/carrier_command.xml');
+
 
     }
 
-    function create() {
+    var bmpText;
+    function create () {
 
-        //  We're going to be using physics, so enable the Arcade Physics system
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+        //  Resize our game world to be a 2000 x 2000 square
+        game.world.setBounds(-500, -500, 1000, 1000);
 
+        //  The base of our player
+        player = game.add.sprite(0, 0, 'player');
+        player.anchor.setTo(0.5, 0.5);
 
-        blackholes = game.add.group();
-        blackholes.enableBody = true;
-        game.physics.enable(blackholes, Phaser.Physics.ARCADE);
-
-        // Here we create the ground.
-        createBlackhole(15, 15);
-
-        player = game.add.sprite(10, 10, 'star');
-        //player = new Player(new Phaser.Point(0, 1), spritePlayer);
-
-        //  We need to enable physics on the player
+        //  This will force the player to decelerate and limit its speed
         game.physics.enable(player, Phaser.Physics.ARCADE);
         player.body.drag.set(0.2);
         player.body.maxVelocity.setTo(400, 400);
         player.body.collideWorldBounds = true;
+
+
+        //Obstacles
+        //circle = new Phaser.Circle(70, 0,64);
+        circle = game.add.sprite(0,0, 'circle');
+        game.physics.enable(circle, Phaser.Physics.ARCADE);
+
+        lineGroup = game.add.group();
+        var linex = lineGroup.create(10, -50, 'line');
+        linex = lineGroup.create(10, 100, 'line');
+        game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
+
+        // Blackhole Group
+        blackholes = game.add.group();
+        blackholes.enableBody = true;
+        game.physics.enable(blackholes, Phaser.Physics.ARCADE);
+
+        createBlackhole(-50, -50);
+        createBlackhole(-100, -100, 2);
+        createBlackhole(-150, -150, 0.75);
+
+
+
+        player.bringToTop();
+
+        game.camera.follow(player);
+        game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+        game.camera.focusOnXY(0, 0);
+
+        cursors = game.input.keyboard.createCursorKeys();
+
+        // text box
+        bmpText = game.add.bitmapText(game.width / 2, game.height / 2, 'carrier_command','Drag me around !',34);
+        bmpText.inputEnabled = true;
+        bmpText.input.enableDrag();
+        bmpText.fixedToCamera = true;
+        bmpText.cameraOffset.setTo(200, 50);
+
+
     }
 
-    function update() {
 
-        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
+
+    var currentSpeed = 200;
+
+    function testhit() {
+        console.log("hit");
+
+    }
+    function hitLine(player, line) {
+//      player.body.velocity.setTo(-100, -100);
+        player.angle *= -1.0;
+
+        var emitter = game.add.emitter(player.body.x, player.body.y, 3);
+        emitter.makeParticles('balls', [0, 1, 2, 3, 4, 5]);
+        emitter.minParticleSpeed.setTo(-600, -600);
+        emitter.maxParticleSpeed.setTo(600, 600);
+        emitter.gravity = 0;
+        emitter.start(false, 4000, 15);
+    }
+
+    function hitCircle(player, circle) {
+//        player.body.velocity.setTo(-100, -100);
+        console.log("hit circle");
+        var c = Phaser.Color.getRandomColor(50, 255, 255);
+
+        game.stage.backgroundColor = c;
     }
 
     function hitBlackhole(player, blackhole) {
+
+        console.log("hit blackhole");
 
         var v = new Vector(blackhole.x - player.position.x, blackhole.y - player.position.y);
 //        console.log('vGravity: ' + v.x + ' ' + v.y);
@@ -70,10 +134,70 @@
         player.velocity = gravity;
     }
 
-    function createBlackhole(x, y) {
+    function createBlackhole(x, y, scale) {
 
-        blackholes.create(x, y, 'blackhole');
+        var sprite = blackholes.create(x, y, 'blackhole');
+
+        if (scale === undefined) {
+
+            scale = 1;
+        }
+
+        sprite.scale.setTo(scale, scale);
     }
+
+
+    function update () {
+
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
+
+        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
+
+        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
+
+
+        // game.physics.arcade.overlap(player, line2,function() { hit2("hi", line2) }, null, this);
+
+        // update elapsed time
+        bmpText.text = 'TIME: ' + Math.round(game.time.now);
+
+        if (cursors.left.isDown)
+        {
+            player.angle -= 4;
+        }
+        else if (cursors.right.isDown)
+        {
+            player.angle += 4;
+        }
+
+        game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
+/*
+        if (cursors.up.isDown)
+        {
+            //  The speed we'll travel at
+            currentSpeed = 100;
+        }
+        else
+        {
+            if (currentSpeed > 0)
+            {
+                currentSpeed -= 4;
+            }
+        }
+
+        if (currentSpeed > 0)
+        {
+            game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
+        }
+*/
+    }
+
+    function render () {
+
+    }
+
 
     function normalize(point) {
 
