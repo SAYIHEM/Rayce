@@ -15,6 +15,7 @@
 
 <script type="text/javascript">
 
+    var lineGroup;
     var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
 
     function preload () {
@@ -49,10 +50,20 @@
         circle = game.add.sprite(0,0, 'circle');
         game.physics.enable(circle, Phaser.Physics.ARCADE);
 
-        line = game.add.sprite(10, -50, 'line');
-        line2 = game.add.sprite(10, 100, 'line');
-        game.physics.enable(line, Phaser.Physics.ARCADE);
-        game.physics.enable(line2, Phaser.Physics.ARCADE);
+//        line = game.add.sprite(10, -50, 'line');
+//        line2 = game.add.sprite(10, 100, 'line');
+//        game.physics.enable(line, Phaser.Physics.ARCADE);
+//        game.physics.enable(line2, Phaser.Physics.ARCADE);
+
+
+        lineGroup = game.add.group();
+
+
+        var linex = lineGroup.create(10, -50, 'line');
+        linex = lineGroup.create(10, 100, 'line');
+
+        game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
+
 
         player.bringToTop();
 
@@ -77,20 +88,23 @@
 
     }
     function hitLine(player, line) {
-//        player.body.velocity.setTo(-100, -100);
+//      player.body.velocity.setTo(-100, -100);
         player.angle *= -1.0;
     }
 
-    function hit2(par1, par2) {
-        console.log(par2);
+    function hitCircle(player, circle) {
+//        player.body.velocity.setTo(-100, -100);
+        console.log("hit circle");
     }
+
+
 
     function update () {
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, circle, hit, null, this);
+        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
 
-        game.physics.arcade.overlap(player, line, hitLine, null, this);
+        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
 
         // game.physics.arcade.overlap(player, line2,function() { hit2("hi", line2) }, null, this);
 
