@@ -1,4 +1,4 @@
-function Player(velocity, sprite){
+function Player(velocity, sprite) {
 
     this.position = new Phaser.Point(game.width / 2.0, game.height / 2.0);
     this.velocity = velocity;
