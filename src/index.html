@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <title>Phaser - Making your first game, part 9</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <script src="obstacles/Mirror.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -16,6 +17,7 @@
 <script type="text/javascript">
 
     var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+    var obstacles = [];
 
     function preload () {
 
@@ -45,14 +47,7 @@
 
 
         //Obstacles
-        //circle = new Phaser.Circle(70, 0,64);
-        circle = game.add.sprite(0,0, 'circle');
-        game.physics.enable(circle, Phaser.Physics.ARCADE);
-
-        line = game.add.sprite(10, -50, 'line');
-        line2 = game.add.sprite(10, 100, 'line');
-        game.physics.enable(line, Phaser.Physics.ARCADE);
-        game.physics.enable(line2, Phaser.Physics.ARCADE);
+        createObjects();
 
         player.bringToTop();
 
@@ -62,36 +57,42 @@
         game.camera.focusOnXY(0, 0);
 
 
-
-
         cursors = game.input.keyboard.createCursorKeys();
 
     }
 
+    createObjects = function() {
+        var object;
+        var sprite;
+
+        random = Math.random()*2;
+
+        object = 'line';
+        sprite = game.add.sprite(10, -50, object);
+
+        var obstacle = new Mirror(sprite);
+        game.physics.enable(sprite, Phaser.Physics.ARCADE);
+        obstacles.push(obstacle);
+    };
 
 
     var currentSpeed = 0;
 
-    function hit() {
-        console.log("hit");
+    checkElements = function () {
+        for (var i=0;i<obstacles.length;i++) {
+            cur_obstacle = obstacles[i];
+            cur_sprite =  cur_obstacle.sprite;
 
-    }
-    function hit1() {
-        console.log("hit1");
-    }
+            //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+            game.physics.arcade.overlap(player, cur_sprite,function() { cur_obstacle.interact(player) }, null, this);
 
-    function hit2(par1, par2) {
-        console.log(par2);
-    }
+        }
+    };
+
 
     function update () {
 
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, circle, hit, null, this);
-
-        game.physics.arcade.overlap(player, line, hit1, null, this);
-
-        game.physics.arcade.overlap(player, line2,function() { hit2("hi", line2) }, null, this);
+       checkElements();
 
         if (cursors.left.isDown)
         {
