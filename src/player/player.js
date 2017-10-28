@@ -14,7 +14,7 @@ function Player(velocity, controller, sprite){
 
         for(j = 0; j < hitObstacle.length; j++){
 
-        hitObstacle[j].interact(this);
+        hitObstacle[j].prototype.interact(this);
       }
 
     }
