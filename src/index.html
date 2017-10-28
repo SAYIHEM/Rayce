@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Phaser - Making your first game, part 1</title>
+    <title>Phaser - Making your first game, part 9</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
     <style type="text/css">
         body {
@@ -14,23 +14,150 @@
 
 <script type="text/javascript">
 
-    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
+    var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render : render });
+
+    var gameX;
+    var gameY;
     function preload() {
 
+        game.stage.backgroundColor = '#007236';
+
+        game.load.image('mushroom', 'assets/sprites/mushroom2.png');
+        game.load.image('sonic', 'assets/sprites/sonic_havok_sanity.png');
+        game.load.image('phaser', 'assets/sprites/phaser1.png');
+
     }
+
+    var cursors;
+    var player;
+    var logo2;
 
     function create() {
 
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+
+        //  Modify the world and camera bounds
+        game.world.resize(6000, 6000);
+
+        for (var i = 0; i < 250; i++)
+        {
+            game.add.sprite(game.world.randomX, game.world.randomY, 'mushroom');
+        }
+
+        // game.add.text(32, 32, "this text is on the background\nuse arrows to scroll", { font: "32px Arial", fill: "#f26c4f", align: "left" });
+
+        player = game.add.sprite(game.world.centerX, game.world.centerY, 'phaser');
+        game.physics.arcade.enable(player);
+        // player.fixedToCamera = true;
+
+        // player.body.collideWorldBounds = true;
+//
+//        logo2 = game.add.sprite(500, 100, 'phaser');
+//        logo2.fixedToCamera = true;
+
+//        var t = game.add.text(200, 500, "this text is fixed to the camera", { font: "32px Arial", fill: "#ffffff", align: "center" });
+//        t.fixedToCamera = true;
+//        t.cameraOffset.setTo(200, 500);
+
+//        game.add.tween(logo2.cameraOffset).to( { y: 400 }, 2000, Phaser.Easing.Back.InOut, true, 0, 2000, true);
+
+        cursors = game.input.keyboard.createCursorKeys();
+
+
 
 
     }
+
+
+    var velX = 0;
+    var velY = 5;
+    const angle = 0.05;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+
+    var direction_x = 0;
+    var direction_y = 1;
 
     function update() {
+        velX = player.velX;
+        velY = player.velY;
+
+        /*
+        player.body.x += velX;
+        player.body.y += velY;
+
+        gameX = game.width / 2 + player.body.width / 2;
+        gameY = game.height / 2 + player.body.height / 2;
+
+        game.camera.x = player.body.x - gameX;
+        game.camera.y = player.body.y - gameY;
+
+        */
+
+        player.body.x += velX;
+        player.body.y += velY;
+
+
+
+        if (cursors.left.isDown)
+        {
+            //velX +=1;
+            // player.body.y -= 5;
+            // player.body.x += 5;
+
+            velXNew = (cos * velX - sin * velY);
+            velYNew = (-sin * velX + cos * velY);
+
+            velX = velXNew;
+            vel = velYNew;
+
+
+        }
+        else if (cursors.right.isDown)
+
+        {
+
+            velXNew = cos * velX - sin * velY;
+            velYNew = sin * velX + cos * velY;
+
+            velX = velXNew;
+            velY = velYNew;
+
+
+        }
+
+
+
+            new_dir_x = velX/length(velX,velY);
+            new_dir_y = velY/length(velX,velY);
+
+            new_turn = Math.acos(scalar(direction_x,direction_y,new_dir_x,new_dir_y));
+            console.log(new_turn);
+            game.world.rotation = new_turn;
+
+            direction_y = new_dir_y;
+            direction_x = new_dir_x;
 
     }
+    function scalar(x1,y1,x2,y2) {
+        return x1*x2 + y1 * y2;
+    }
+
+    function length(x,y) {
+        return Math.sqrt(x*x + y*y);
+    }
+
+    function render() {
+
+        // game.debug.cameraInfo(game.camera, 32, 32);
+
+    }
+
 
 </script>
 
 </body>
-</html>Title
+</html>
