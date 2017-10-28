@@ -16,10 +16,8 @@
 <script type="text/javascript">
 
     var lineGroup;
-    var circleGroup
+    var circleGroup;
     var prismaGroup;
-    var extraLinesGroup;
-    var blackholes;
     var blackholesGroup;
 
     var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
@@ -70,17 +68,19 @@
         circle = game.add.sprite(0, 0, 'circle');
         game.physics.enable(circle, Phaser.Physics.ARCADE);
 
+        /*
         lineGroup = game.add.group();
         var linex = lineGroup.create(10, -50, 'line');
         linex = lineGroup.create(10, 100, 'line');
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
+        */
 
         // Blackhole Group
         blackholes = game.add.group();
         blackholes.enableBody = true;
         game.physics.enable(blackholes, Phaser.Physics.ARCADE);
 
-        createBlackhole(-400, -400, 4);
+        //createBlackhole(-400, -400, 4);
 
 
         player.bringToTop();
@@ -116,10 +116,10 @@
             game.world.width, game.world.height, 2, {threshold: 100}, {prism: prismaGroup});
         game.physics.enable(prismaGroup, Phaser.Physics.ARCADE);
 
-        extraLinesGroup = game.add.group();
+        lineGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 1, {threshold: 200}, {line: extraLinesGroup});
-        game.physics.enable(extraLinesGroup, Phaser.Physics.ARCADE);
+            game.world.width, game.world.height, 1, {threshold: 200}, {line: lineGroup});
+        game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
 
         blackholesGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
@@ -173,12 +173,11 @@
 
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
+        //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
         game.physics.arcade.overlap(player, circleGroup, hitCircle, null, this);
         game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
-        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
+        //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
         game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
-        game.physics.arcade.overlap(player, extraLinesGroup, hitPrisma, null, this);
         game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
     }
 
@@ -205,7 +204,7 @@
         emitter.minParticleSpeed.setTo(-600, -600);
         emitter.maxParticleSpeed.setTo(600, 600);
         emitter.gravity = 0;
-        emitter.start(false, 400, 15);
+        //emitter.start(false, 400, 15);
 
 
     }
@@ -273,7 +272,7 @@
         console.log(player.body.velocity);
         console.log("----------------");
     }
-
+    /*
     function createBlackhole(x, y, scale) {
 
         var sprite = blackholes.create(x, y, 'blackhole');
@@ -283,6 +282,7 @@
 
         sprite.scale.setTo(scale, scale);
     }
+    */
 
 
     function normalize(point) {
