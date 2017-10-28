@@ -1,8 +1,7 @@
-
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Phaser - Making your first game, part 9</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
     <script src="./world/worldGenerator.js"></script>
@@ -19,13 +18,17 @@
     var lineGroup;
     var circleGroup
     var prismaGroup;
-    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
+        preload: preload,
+        create: create,
+        update: update,
+        render: render
+    });
     var blackholes;
     var player;
 
 
-
-    function preload () {
+    function preload() {
 
         game.stage.backgroundColor = '#cfccd1';
         //game.load.image('player', 'assets/sprites/spinObj_01.png');
@@ -44,7 +47,8 @@
 
     var bmpText;
     var prism;
-    function create () {
+
+    function create() {
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(-500, -500, 1000, 1000);
 
@@ -62,7 +66,7 @@
 
         //Obstacles
         //circle = new Phaser.Circle(70, 0,64);
-        circle = game.add.sprite(0,0, 'circle');
+        circle = game.add.sprite(0, 0, 'circle');
         game.physics.enable(circle, Phaser.Physics.ARCADE);
 
         lineGroup = game.add.group();
@@ -75,8 +79,7 @@
         blackholes.enableBody = true;
         game.physics.enable(blackholes, Phaser.Physics.ARCADE);
 
-        createBlackhole(-400, -400, 16);
-
+        createBlackhole(-400, -400, 4);
 
 
         player.bringToTop();
@@ -102,27 +105,72 @@
 
 
         circleGroup = game.add.group();
-        generateObstackleSections(game.world.width / -2 , game.world.height / -2,
+        generateObstackleSections(game.world.width / -2, game.world.height / -2,
             game.world.width, game.world.height, 2, {threshold: 100}, {circle: circleGroup});
         game.physics.enable(circleGroup, Phaser.Physics.ARCADE);
 
         prismaGroup = game.add.group();
-        generateObstackleSections(game.world.width / -2 , game.world.height / -2,
+        generateObstackleSections(game.world.width / -2, game.world.height / -2,
             game.world.width, game.world.height, 2, {threshold: 100}, {prism: prismaGroup});
         game.physics.enable(prismaGroup, Phaser.Physics.ARCADE);
 
         player.bringToTop();
 
         // text box
-        bmpText = game.add.bitmapText(game.width / 2, game.height / 2, 'carrier_command','Drag me around !',34);
+        bmpText = game.add.bitmapText(game.width / 2, game.height / 2, 'carrier_command', 'Drag me around !', 34);
         bmpText.inputEnabled = true;
         bmpText.input.enableDrag();
         bmpText.fixedToCamera = true;
         bmpText.cameraOffset.setTo(200, 50);
 
+        player.body.velocity.setTo(5, 0);
+
     }
 
+    function update() {
 
+        // update elapsed time
+        bmpText.text = 'TIME: ' + Math.round(game.time.now);
+
+        if (cursors.left.isDown) {
+            player.angle -= 4;
+        }
+        else if (cursors.right.isDown) {
+            player.angle += 4;
+        }
+
+        /*
+        var cur_velocity = new Vector(player.body.velocity.x,player.body.velocity.y);
+        console.log(cur_velocity);
+        speed = cur_velocity.v_length();
+
+        angle = player.angle;
+        new_velo_x = cur_velocity.x * Math.cos(angle) - cur_velocity.y * Math.sin(angle);
+        new_velo_y = cur_velocity.x * Math.sin(angle) + cur_velocity.y * Math.cos(angle);
+
+        player.body.velocity.setTo(new_velo_x,new_velo_y);
+        console.log(player.body.velocity);
+        console.log("------------------------");
+        */
+
+
+        game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
+
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
+        game.physics.arcade.overlap(player, circleGroup, hitCircle, null, this);
+
+        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
+
+        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
+
+        game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
+    }
+
+    function render() {
+
+    }
 
     var currentSpeed = 200;
 
@@ -130,6 +178,7 @@
         console.log("hit");
 
     }
+
     function hitLine(player, line) {
 //      player.body.velocity.setTo(-100, -100);
         player.angle *= -1.0;
@@ -158,15 +207,16 @@
     function hitPrisma(player, prisma) {
         var coefficient = 2;
 //      player.body.velocity.setTo(-100, -100);
-        player.angle += 20 / coefficient *(-1);
+        player.angle += 20 / coefficient * (-1);
 
         var c = Phaser.Color.getRandomColor(50, 255, 255);
 
 
-        setTimeout(function() {
+        setTimeout(function () {
             game.stage.backgroundColor = c;
             player.tint = Math.random() * 0xffffff;
         }, 1000);
+    }
 
 
     var GRAVITY = 1728000;
@@ -180,9 +230,9 @@
 
         distance = g.v_length();
 
-        cur_gravity = (1 / (distance*distance)) * GRAVITY;
+        cur_gravity = (1 / (distance * distance)) * GRAVITY;
 
-        if (cur_gravity>MAX_GRAVITY) {
+        if (cur_gravity > MAX_GRAVITY) {
             cur_gravity = MAX_GRAVITY;
         }
 
@@ -200,7 +250,6 @@
         console.log(player.body.velocity);
 
         new_x = g.x + player.body.velocity.x;
-
         new_y = g.y + player.body.velocity.y;
 
 
@@ -220,66 +269,6 @@
     }
 
 
-    function update () {
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        // game.physics.arcade.overlap(player, circle, hitCircle, null, this);
-
-        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
-
-        // game.physics.arcade.overlap(player, prism, hitPrisma, null, this);
-
-
-        game.physics.arcade.overlap(player, circleGroup, hitCircle, null, this);
-
-        game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
-
-
-        // update elapsed time
-        bmpText.text = 'TIME: ' + Math.round(game.time.now);
-
-        if (cursors.left.isDown)
-        {
-            player.angle -= 4;
-        }
-        else if (cursors.right.isDown)
-        {
-            player.angle += 4;
-        }
-
-        game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
-/*
-        if (cursors.up.isDown)
-        {
-            //  The speed we'll travel at
-            currentSpeed = 100;
-        }
-        else
-        {
-            if (currentSpeed > 0)
-            {
-                currentSpeed -= 4;
-            }
-        }
-
-        if (currentSpeed > 0)
-        {
-            game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
-        }
-*/
-
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
-
-        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
-
-        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
-    }
-
-    function render () {
-
-    }
-
-
     function normalize(point) {
 
         var len = Math.sqrt(point.x * point.x + point.y * point.y);
@@ -292,9 +281,10 @@
         this.x = x;
         this.y = y;
 
-        this.v_length = function() {
-            return Math.sqrt(this.x*this.x + this.y*this.y);
+        this.v_length = function () {
+            return Math.sqrt(this.x * this.x + this.y * this.y);
         }
+
     }
 
 </script>
