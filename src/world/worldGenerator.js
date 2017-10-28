@@ -10,6 +10,8 @@
  */
 function generateObstackleSections(x,y,width,height, recursionCounter, options, types){
 
+    console.log("generating");
+
     var threshold = options.threshold || 0.0;
     var probability = options.probability || 1.0;
 
