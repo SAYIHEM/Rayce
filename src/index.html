@@ -22,6 +22,8 @@
         game.stage.backgroundColor = '#cfccd1';
         //game.load.image('player', 'assets/sprites/spinObj_01.png');
         game.load.image('player', 'assets/sprites/blue_ball.png');
+        game.load.image('circle', 'assets/sprites/block.png');
+        game.load.image('line', 'assets/sprites/vu.png');
 
     }
 
@@ -29,7 +31,7 @@
 
 
         //  Resize our game world to be a 2000 x 2000 square
-        game.world.setBounds(-1000, -1000, 2000, 2000);
+        game.world.setBounds(-500, -500, 1000, 1000);
 
         //  The base of our player
         player = game.add.sprite(0, 0, 'player');
@@ -41,12 +43,26 @@
         player.body.maxVelocity.setTo(400, 400);
         player.body.collideWorldBounds = true;
 
+
+        //Obstacles
+        //circle = new Phaser.Circle(70, 0,64);
+        circle = game.add.sprite(0,0, 'circle');
+        game.physics.enable(circle, Phaser.Physics.ARCADE);
+
+        line = game.add.sprite(10, -50, 'line');
+        line2 = game.add.sprite(10, 100, 'line');
+        game.physics.enable(line, Phaser.Physics.ARCADE);
+        game.physics.enable(line2, Phaser.Physics.ARCADE);
+
         player.bringToTop();
 
 
         game.camera.follow(player);
         game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
         game.camera.focusOnXY(0, 0);
+
+
+
 
         cursors = game.input.keyboard.createCursorKeys();
 
@@ -56,8 +72,26 @@
 
     var currentSpeed = 0;
 
+    function hit() {
+        console.log("hit");
+
+    }
+    function hit1() {
+        console.log("hit1");
+    }
+
+    function hit2(par1, par2) {
+        console.log(par2);
+    }
 
     function update () {
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        game.physics.arcade.overlap(player, circle, hit, null, this);
+
+        game.physics.arcade.overlap(player, line, hit1, null, this);
+
+        game.physics.arcade.overlap(player, line2,function() { hit2("hi", line2) }, null, this);
 
         if (cursors.left.isDown)
         {
@@ -71,7 +105,7 @@
         if (cursors.up.isDown)
         {
             //  The speed we'll travel at
-            currentSpeed = 300;
+            currentSpeed = 100;
         }
         else
         {
@@ -89,7 +123,6 @@
     }
 
     function render () {
-
 
     }
 
