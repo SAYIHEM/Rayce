@@ -23,6 +23,9 @@ function Blackhole(sprite) {
         point.x /= len;
         point.y /= len;
     }
+    draw = function () {
+
+    }
 }
 
 
