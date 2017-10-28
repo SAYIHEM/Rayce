@@ -22,7 +22,7 @@
 
         game.stage.backgroundColor = '#cfccd1';
         //game.load.image('player', 'assets/sprites/spinObj_01.png');
-        game.load.image('player', 'assets/sprites/blue_ball.png');
+        game.load.image('player', 'assets/sprites/onion.png');
         game.load.image('circle', 'assets/sprites/block.png');
         game.load.image('line', 'assets/sprites/vu.png');
 
@@ -35,8 +35,8 @@
     }
 
     var bmpText;
+    var prisma;
     function create () {
-
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(-500, -500, 1000, 1000);
 
@@ -62,8 +62,6 @@
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
 
 
-        player.bringToTop();
-
         game.camera.follow(player);
         game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
         game.camera.focusOnXY(0, 0);
@@ -76,6 +74,24 @@
         bmpText.input.enableDrag();
         bmpText.fixedToCamera = true;
         bmpText.cameraOffset.setTo(200, 50);
+
+
+
+        // create a new bitmap data object
+        var bmd = game.add.bitmapData(128,128);
+
+        // draw to the canvas context like normal
+        bmd.ctx.beginPath();
+        bmd.ctx.rect(0,100,120,12);
+        bmd.ctx.fillStyle = '#ff0000';
+        bmd.ctx.fill();
+
+        // use the bitmap data as the texture for the sprite
+        prisma = game.add.sprite(200, 200, bmd);
+        game.physics.enable(prisma, Phaser.Physics.ARCADE);
+
+
+        player.bringToTop();
 
 
     }
@@ -106,19 +122,26 @@
         var c = Phaser.Color.getRandomColor(50, 255, 255);
 
         game.stage.backgroundColor = c;
+        player.tint = Math.random() * 0xffffff;
+    }
+
+    function hitPrisma(player, prisma) {
+        var coefficient = 2;
+//      player.body.velocity.setTo(-100, -100);
+        player.angle += 20 / coefficient ;
     }
 
 
-
     function update () {
-
-
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         game.physics.arcade.overlap(player, circle, hitCircle, null, this);
 
         game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
 
         // game.physics.arcade.overlap(player, line2,function() { hit2("hi", line2) }, null, this);
+
+        game.physics.arcade.overlap(player, prisma, hitPrisma, null, this);
+
 
         // update elapsed time
         bmpText.text = 'TIME: ' + Math.round(game.time.now);
