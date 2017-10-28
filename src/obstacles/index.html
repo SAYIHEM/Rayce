@@ -5,7 +5,7 @@
     <title>Phaser - Making your first game, part 3</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
     <script src="Blackhole.js"></script>
-    <script src="player.js"></script>
+    <script src="Player.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -18,39 +18,65 @@
 
     var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, });
     var player;
-    var blackHole;
-    var world;
+    var blackholes;
 
     function preload() {
 
-        game.load.image('star', 'star.png');
+        game.load.image('sky', 'assets/sky.png');
+        game.load.image('ground', 'assets/platform.png');
+        game.load.image('star', 'assets/star.png');
+        game.load.image('blackhole', 'assets/blackhole.png');
+        game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 
     }
 
     function create() {
 
-        console.log("Hello World");
+        //  We're going to be using physics, so enable the Arcade Physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        var spriteHole = game.add.sprite(20, 10, 'star');
-        var spritePlayer = game.add.sprite(40, 10, 'star');
+        //  A simple background for our game
+        game.add.sprite(0, 0, 'sky');
 
-        player = new Player(new Phaser.Point(0, 1), null, spritePlayer);
-        blackHole = new Blackhole(spriteHole);
+        blackholes = game.add.group();
 
-        game.physics.arcade.enable(player.sprite);
-        game.physics.enable(blackHole.sprite, Phaser.Physics.ARCADE);
-//
-        world = game.add.group();
-        world.add(blackHole.sprite);
-        world.create(20, 10, 'star').body.immovable = true;
+
+        //  We will enable physics for any object that is created in this group
         world.enableBody = true;
+
+        // Here we create the ground.
+        var pos = Phaser.Point(150, 150);
+        createBlackhole(pos);
+
+        var spritePlayer = game.add.sprite(10, 10, 'star');
+        player = new Player(new Phaser.Point(0, 1), spritePlayer);
+
+        //  We need to enable physics on the player
+        game.physics.arcade.enable(player);
+
     }
 
     function update() {
 
-        player.update(world);
-        console.log("tick...")
+        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
+    }
+
+    function hitBlackhole(player, blackhole) {
+
+        var d = new Phaser.Point(blackhole.x - player.position.x, blackhole.y - player.position.y);
+        console.log('vGravity: ' + d);
+        var nd = normalize(d);
+        console.log('vnGravity: ' + nd);
+        var gravity = new Phaser.Point(nd.x * 1.3, nd.y * 1.3);
+
+        player.velocity.x = gravity.x;
+        player.velocity.y = gravity.y;
+        console.log("interaction from blackhole");
+    }
+
+    function createBlackhole(position) {
+
+        blackholes.create(position.x, position.y, 'blackhole');
     }
 
 </script>
