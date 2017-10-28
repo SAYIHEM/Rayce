@@ -53,6 +53,12 @@ function Mirror( mirrorPos, mirrorDir) {
 
     };
 
+    this.draw = function () {
+        start_x = this.mirrorPosition.x;
+        start_y = this.mirrorPosition.y;
+        var line = new Phaser.Line(start_x,start_y,start_x + this.mirror_direction.x,start_y + this.mirror_direction.y);
+    }
+
 
 
 
