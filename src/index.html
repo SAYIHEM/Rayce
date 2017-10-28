@@ -18,6 +18,9 @@
     var lineGroup;
     var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
     var blackholes;
+    var player;
+
+
 
     function preload () {
 
@@ -45,13 +48,14 @@
 
         //  The base of our player
         player = game.add.sprite(0, 0, 'player');
-        player.anchor.setTo(0.5, 0.5);
 
         //  This will force the player to decelerate and limit its speed
-        game.physics.enable(player, Phaser.Physics.ARCADE);
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        game.physics.arcade.enable(player);
         player.body.drag.set(0.2);
         player.body.maxVelocity.setTo(400, 400);
         player.body.collideWorldBounds = true;
+        player.body.allowGravity = true;
 
 
         //Obstacles
@@ -69,9 +73,7 @@
         blackholes.enableBody = true;
         game.physics.enable(blackholes, Phaser.Physics.ARCADE);
 
-        createBlackhole(-50, -50);
-        createBlackhole(-100, -100, 2);
-        createBlackhole(-150, -150, 0.75);
+        createBlackhole(-400, -400, 16);
 
 
 
@@ -110,7 +112,7 @@
         emitter.minParticleSpeed.setTo(-600, -600);
         emitter.maxParticleSpeed.setTo(600, 600);
         emitter.gravity = 0;
-        emitter.start(false, 4000, 15);
+        //emitter.start(false, 4000, 15);
     }
 
     function hitCircle(player, circle) {
@@ -121,42 +123,59 @@
         game.stage.backgroundColor = c;
     }
 
+
+    var GRAVITY = 1728000;
+    var MAX_GRAVITY = 180;
+
     function hitBlackhole(player, blackhole) {
+        middle_x = blackhole.x + blackhole.body.width / 2;
+        middle_y = blackhole.y + blackhole.body.height / 2;
 
-        console.log("hit blackhole");
+        var g = new Vector(middle_x - player.body.x, middle_y - player.body.y);
 
-        var v = new Vector(blackhole.x - player.position.x, blackhole.y - player.position.y);
-//        console.log('vGravity: ' + v.x + ' ' + v.y);
-        normalize(v);
-//        console.log('vnGravity: ' + v.x + ' ' + v.y);
-        var gravity = new Vector(v.x * 1.3, v.y * 1.3);
+        distance = g.v_length();
 
-        player.velocity = gravity;
+        cur_gravity = (1 / (distance*distance)) * GRAVITY;
+
+        if (cur_gravity>MAX_GRAVITY) {
+            cur_gravity = MAX_GRAVITY;
+        }
+
+        console.log("Current Gravity" + cur_gravity);
+        //cur_gravity = GRAVITY;
+
+        console.log("Distanz" + distance);
+
+
+        normalize(g);
+
+        g.x *= cur_gravity;
+        g.y *= cur_gravity;
+
+        console.log(player.body.velocity);
+
+        new_x = g.x + player.body.velocity.x;
+
+        new_y = g.y + player.body.velocity.y;
+
+
+        player.body.velocity.setTo(new_x, new_y);
+        console.log(player.body.velocity);
+        console.log("----------------");
     }
 
     function createBlackhole(x, y, scale) {
 
         var sprite = blackholes.create(x, y, 'blackhole');
+//        game.physics.arcade.enable(sprite);
 
-        if (scale === undefined) {
-
-            scale = 1;
-        }
+        if (scale === undefined) scale = 1;
 
         sprite.scale.setTo(scale, scale);
     }
 
 
     function update () {
-
-
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
-
-        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
-
-        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
-
 
         // game.physics.arcade.overlap(player, line2,function() { hit2("hi", line2) }, null, this);
 
@@ -192,6 +211,13 @@
             game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
         }
 */
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        game.physics.arcade.overlap(player, circle, hitCircle, null, this);
+
+        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
+
+        game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
     }
 
     function render () {
@@ -210,6 +236,10 @@
 
         this.x = x;
         this.y = y;
+
+        this.v_length = function() {
+            return Math.sqrt(this.x*this.x + this.y*this.y);
+        }
     }
 
 </script>
