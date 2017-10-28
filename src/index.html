@@ -16,16 +16,22 @@
 <script type="text/javascript">
 
     var lineGroup;
-    var circleGroup;
+    var circleGroup
     var prismaGroup;
+    var extraLinesGroup;
+    var blackholes;
     var blackholesGroup;
 
     var game = new Phaser.Game(800, 800, Phaser.AUTO, 'phaser-example', {
+    var rayEmitter;
+
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update,
         render: render
     });
+    var blackholes;
     var player;
 
 
@@ -43,6 +49,8 @@
         game.load.spritesheet('balls', 'assets/sprites/balls.png', 17, 17);
         // font
         game.load.bitmapFont('carrier_command', 'assets/fonts/bitmapFonts/carrier_command.png', 'assets/fonts/bitmapFonts/carrier_command.xml');
+
+
     }
 
     var bmpText;
@@ -65,22 +73,21 @@
 
 
         //Obstacles
+        //circle = new Phaser.Circle(70, 0,64);
         circle = game.add.sprite(0, 0, 'circle');
         game.physics.enable(circle, Phaser.Physics.ARCADE);
 
-        /*
         lineGroup = game.add.group();
         var linex = lineGroup.create(10, -50, 'line');
         linex = lineGroup.create(10, 100, 'line');
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
-        */
 
         // Blackhole Group
         blackholes = game.add.group();
         blackholes.enableBody = true;
         game.physics.enable(blackholes, Phaser.Physics.ARCADE);
 
-        //createBlackhole(-400, -400, 4);
+        createBlackhole(-400, -400, 4);
 
 
         player.bringToTop();
@@ -109,23 +116,11 @@
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
             game.world.width, game.world.height, 2, {threshold: 100}, {circle: circleGroup});
         game.physics.enable(circleGroup, Phaser.Physics.ARCADE);
-        circleGroup.enableBody = true;
 
         prismaGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
             game.world.width, game.world.height, 2, {threshold: 100}, {prism: prismaGroup});
         game.physics.enable(prismaGroup, Phaser.Physics.ARCADE);
-
-        lineGroup = game.add.group();
-        generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 1, {threshold: 200}, {line: lineGroup});
-        game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
-
-        blackholesGroup = game.add.group();
-        generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 1, {threshold: 100}, {hole: blackholesGroup});
-        game.physics.enable(blackholesGroup, Phaser.Physics.ARCADE);
-
 
         player.bringToTop();
 
@@ -139,8 +134,6 @@
         player.body.velocity.setTo(5, 0);
 
     }
-
-    var currentSpeed = 200;
 
     function update() {
 
@@ -175,16 +168,21 @@
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
         game.physics.arcade.overlap(player, circleGroup, hitCircle, null, this);
+
         game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
+
         //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
-        game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
         game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
+        game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
+
+        rayParticlesUpdate();
     }
 
     function render() {
 
     }
 
+    var currentSpeed = 200;
 
     function testhit() {
         console.log("hit");
@@ -195,8 +193,8 @@
 //      player.body.velocity.setTo(-100, -100);
         player.angle *= -1.0;
 
-        line.body.x += Math.floor(Math.random() * 40) - 15;
-        line.body.y += Math.floor(Math.random() * 40) - 15;
+        //line.body.x += Math.floor(Math.random() * 30) - 15;
+        //line.body.y += Math.floor(Math.random() * 30) - 15;
 
 
         var emitter = game.add.emitter(player.body.x, player.body.y, 2);
@@ -204,7 +202,7 @@
         emitter.minParticleSpeed.setTo(-600, -600);
         emitter.maxParticleSpeed.setTo(600, 600);
         emitter.gravity = 0;
-        //emitter.start(false, 400, 15);
+        emitter.start(false, 4000, 15);
 
 
     }
@@ -212,13 +210,6 @@
     function hitCircle(player, circle) {
 //        player.body.velocity.setTo(-100, -100);
         console.log("hit circle");
-        circle.body.gravity.y = 2000;
-        //circle.body.bounce.y = 0.7 + Math.random() * 0.2;
-        /*
-        setTimeout(function () {
-            circle.kill();
-        }, 1000);
-        */
     }
 
     function hitPrisma(player, prisma) {
@@ -232,7 +223,7 @@
         setTimeout(function () {
             game.stage.backgroundColor = c;
             player.tint = Math.random() * 0xffffff;
-        }, 100);
+        }, 1000);
     }
 
 
@@ -274,7 +265,7 @@
         console.log(player.body.velocity);
         console.log("----------------");
     }
-    /*
+
     function createBlackhole(x, y, scale) {
 
         var sprite = blackholes.create(x, y, 'blackhole');
@@ -284,7 +275,6 @@
 
         sprite.scale.setTo(scale, scale);
     }
-    */
 
 
     function normalize(point) {
