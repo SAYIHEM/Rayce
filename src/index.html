@@ -22,6 +22,8 @@
     var blackholes;
     var blackholesGroup;
 
+    var rayEmitter;
+
     var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
@@ -36,11 +38,13 @@
 
         game.stage.backgroundColor = '#cfccd1';
         //game.load.image('player', 'assets/sprites/spinObj_01.png');
-        game.load.image('player', 'assets/sprites/onion.png');
+        game.load.image('photon', 'assets/photon_small.png');
         game.load.image('circle', 'assets/sprites/carrot.png');
         game.load.image('line', 'assets/sprites/vu.png');
         game.load.image('prism', 'assets/sprites/diamond.png');
         game.load.image('hole', 'assets/sprites/block.png');
+        game.load.image('ray4', 'assets/light_ray/ray5.png');
+
 
         // particles
         game.load.spritesheet('balls', 'assets/sprites/balls.png', 17, 17);
@@ -58,7 +62,7 @@
         game.world.setBounds(-500, -500, 1000, 1000);
 
         //  The base of our player
-        player = game.add.sprite(0, 0, 'player');
+        player = game.add.sprite(0, 0, 'photon');
 
         //  This will force the player to decelerate and limit its speed
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -90,6 +94,7 @@
         player.bringToTop();
 
         game.camera.follow(player);
+        
         game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
         game.camera.focusOnXY(0, 0);
 
@@ -130,6 +135,8 @@
 
         player.body.velocity.setTo(5, 0);
 
+
+        rayParticlesInit();
     }
 
     function update() {
@@ -171,10 +178,43 @@
         game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
 
         game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
+
+        rayParticlesUpdate();
     }
 
     function render() {
 
+    }
+    
+    function rayParticlesInit() {
+
+        rayEmitter = game.add.emitter(game.world.centerX, game.world.centerY, 400);
+
+        rayEmitter.makeParticles( [ 'ray4' ] );
+
+        rayEmitter.gravity = 100;
+        rayEmitter.setAlpha(1, 0, 3000);
+        rayEmitter.setScale(0.5, 0, 0.5, 0, 3000);
+
+        rayEmitter.start(false, 3000, 5);
+    }
+
+    function rayParticlesUpdate() {
+
+        var px = player.body.velocity.x;
+        var py = player.body.velocity.y;
+
+        px *= 0;
+        py *= 0;
+
+        rayEmitter.minParticleSpeed.set(px, py);
+        rayEmitter.maxParticleSpeed.set(px, py);
+
+        rayEmitter.emitX = player.x;
+        rayEmitter.emitY = player.y;
+
+        // emitter.forEachExists(game.world.wrap, game.world);
+        game.world.wrap(player, 8);
     }
 
     var currentSpeed = 200;
