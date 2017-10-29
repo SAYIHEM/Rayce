@@ -34,14 +34,19 @@
     var player;
 
     var bmpText;
+    var pauseText;
     var prism;
 
+    // Keys
     var keyESC;
     var keyENTER;
     var keyLEFT;
     var keyRIGHT;
     var keyA;
     var keyD;
+
+    // Filters
+    var filterGrey;
 
     var CURRENT_SPEED = 200;
     // ----- ---------------- ----- //
@@ -55,6 +60,7 @@
     function preload() {
 
         game.stage.backgroundColor = '#cfccd1';
+        game.load.image('menu_background', 'assets/prism2_cut.png');
         game.load.image('photon', 'assets/mana_small.png');
         game.load.image('mana', 'assets/photon_small.png');
         game.load.image('line', 'assets/line.png');
@@ -77,9 +83,13 @@
 
 
     function create() {
+
+        // Create Filter
+        filterGrey = game.add.filter('Gray');
+
+
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(-500, -500, 1000, 1000);
-
         game.add.tileSprite(-500, -500, 1000, 1000, 'background');
 
 
@@ -94,6 +104,7 @@
         player.body.allowGravity = false;
         player.scale.setTo(0.5, 0.5);
         player.anchor.setTo(0.5, 0.5);
+        
 
         /*
         lineGroup = game.add.group();
@@ -162,19 +173,18 @@
 
         player.bringToTop();
 
-        // text box
+        // Score Text
         bmpText = game.add.bitmapText(game.width / 2, game.height / 2, 'carrier_command', 'Drag me around !', 34);
         bmpText.inputEnabled = true;
-        bmpText.input.enableDrag();
         bmpText.fixedToCamera = true;
         bmpText.cameraOffset.setTo(200, 50);
+
 
         player.body.velocity.setTo(5, 0);
 
 
         keyControllerInit(this);
         rayParticlesInit();
-
     }
 
     // SetUp Hokey-functionality
@@ -194,14 +204,26 @@
             if (!isPaused) {
                 isPaused = true;
 
+                game.world.filters = [filterGrey];
                 rayEmitter.on = false;
+                bmpText.visible = false;
+                drawPauseText();
+                pauseText.visible = true;
+
                 player.body.velocity.setTo(0, 0);
 
             } else {
                 isPaused = false;
 
+                game.world.filters = null;
                 rayEmitter.on = true;
+                bmpText.visible = true;
+                pauseText.visible = false;
+            }
 
+            function drawPauseText() {
+                pauseText = game.add.bitmapText(game.width - 300, game.height / 2, 'carrier_command', 'PAUSE', 36);
+                pauseText.fixedToCamera = true;
             }
         }
 
@@ -261,6 +283,8 @@
 
         // update elapsed time
         bmpText.text = 'TIME: ' + Math.round(game.time.now);
+
+        game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width/2 + game.width / 2,player.body.height/2 + game.height / 2);
     }
 
     function update() {
@@ -291,6 +315,7 @@
         */
 
         game.physics.arcade.velocityFromRotation(player.rotation, CURRENT_SPEED, player.body.velocity);
+
 
         collisionUpdate();
         rayParticlesUpdate();
