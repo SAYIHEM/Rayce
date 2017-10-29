@@ -61,6 +61,11 @@
 
     // ----- ---------------- ----- //
 
+    // audio
+    var blaster;
+    var ping;
+    var loop;
+
 
     function preload() {
 
@@ -84,11 +89,51 @@
 
         // Filters
         game.load.script('gray', 'https://cdn.rawgit.com/photonstorm/phaser/master/v2/filters/Gray.js');
+
+        game.load.audio('sfx', 'assets/audio/SoundEffects/fx_mixdown.ogg');
+
+        game.load.audio('blaster', 'assets/audio/SoundEffects/blaster.mp3');
+        game.load.audio('loop', 'assets/audio/oedipus_ark_pandora.mp3');
     }
 
+    function soundStopped(sound) {
 
+        if (sound === blaster) {
+            console.log("done");
+
+        }
+
+        //blaster.stop();
+
+
+    }
 
     function create() {
+
+        //	Here we set-up our audio sprite
+        fx = game.add.audio('sfx');
+        fx.allowMultiple = true;
+
+        //	And this defines the markers.
+
+        //	They consist of a key (for replaying), the time the sound starts and the duration, both given in seconds.
+        //	You can also set the volume and loop state, although we don't use them in this example (see the docs)
+
+        fx.addMarker('alien death', 1, 1.0);
+        fx.addMarker('boss hit', 3, 0.5);
+        fx.addMarker('escape', 4, 3.2);
+        fx.addMarker('meow', 8, 0.5);
+        fx.addMarker('numkey', 9, 0.1);
+        fx.addMarker('ping', 10, 1.0);
+        fx.addMarker('death', 12, 4.2);
+        fx.addMarker('shot', 17, 1.0);
+        fx.addMarker('squit', 19, 0.3);
+
+        blaster = game.add.audio('blaster');
+        blaster.onStop.add(soundStopped, this);
+
+        loop = game.add.audio('loop');
+        loop.play();
 
         game.time.advancedTiming = true;
         game.time.desiredFps = 60;
@@ -216,6 +261,8 @@
 
         powerUpList = new PowerUpList(lol,game);
         powerUpList.show();
+
+       // game.sound.setDecodedCallback([ blaster ], create, this);
     }
 
     lol = function() {
@@ -251,6 +298,8 @@
 
                 player.body.velocity.setTo(0, 0);
 
+                loop.pause();
+
             } else {
                 isPaused = false;
 
@@ -260,6 +309,9 @@
                 pauseText.visible = false;
 
                 menuBackground.visible = false;
+
+                loop.resume();
+
             }
 
             function drawPauseText() {
@@ -302,7 +354,9 @@
 
         if (keySPACE.isDown) {
           game.time.slowMotion = 0.5;
-            setTimeout(function () {
+          blaster.play();
+
+          setTimeout(function () {
                 game.time.slowMotion = 1.0;
             }, 500);
         }
@@ -340,8 +394,12 @@
 
         // update elapsed time
         bmpText.text = 'TIME: ' + Math.round(game.time.now);
-        if (game.time.now%1000===0) {
+        if (game.time.now % 1000 === 0) {
             CURRENT_SPEED+=10;
+
+            // play a sound
+//            blaster.play();
+//            console.log("yupp");
         }
 
         game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width/2 + game.width / 2,player.body.height/2 + game.height / 2);
@@ -416,6 +474,7 @@
 
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
         game.time.slowMotion = 1.5;
+        fx.play('ping');
         setTimeout(function () {
             game.time.slowMotion = 1.0;
         }, 500);
@@ -479,6 +538,10 @@
         new_y = g.y + player.body.velocity.y;
 
         player.body.velocity.setTo(new_x, new_y);
+
+        // end game
+        //fx.play('death');
+
     }
 
     function createBlackhole(x, y, scale) {
