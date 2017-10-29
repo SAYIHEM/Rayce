@@ -64,7 +64,6 @@
         game.load.image('ray2', 'assets/light_ray/stars_small.png');
         game.load.image('background', 'assets/background.jpg');
 
-
         // Particles
         game.load.spritesheet('balls', 'assets/sprites/balls.png', 17, 17);
         // Font
@@ -159,21 +158,38 @@
             game.world.width, game.world.height, 1, {threshold: 100}, {hole: blackholesGroup});
         game.physics.enable(blackholesGroup, Phaser.Physics.ARCADE);
 
+        // disable drag
+        disableDraggableGroup(manaGroup);
+        disableDraggableGroup(prismaGroup);
+        disableDraggableGroup(lineGroup);
+        disableDraggableGroup(blackholesGroup);
+
 
         player.bringToTop();
 
         // text box
         bmpText = game.add.bitmapText(game.width / 2, game.height / 2, 'carrier_command', 'Drag me around !', 34);
         bmpText.inputEnabled = true;
-        bmpText.input.enableDrag();
+        //bmpText.input.enableDrag();
         bmpText.fixedToCamera = true;
         bmpText.cameraOffset.setTo(200, 50);
 
         player.body.velocity.setTo(5, 0);
 
 
+
         keyControllerInit(this);
         rayParticlesInit();
+
+    }
+    function disableDraggableGroup ( g ) {
+        g.forEach( makeDraggable )
+    }
+
+    function makeDraggable ( obj ) {
+        if ( obj.inputEnabled === undefined ) return;
+
+        obj.inputEnabled = false
 
     }
 
