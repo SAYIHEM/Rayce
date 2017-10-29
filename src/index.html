@@ -34,6 +34,8 @@
 
     var bmpText;
     var pauseText;
+    var continueText;
+    var restartText;
     var prism;
 
     var menuBackground;
@@ -95,8 +97,13 @@
 
         // Create MenuBackground sprite
         menuBackground = game.add.sprite(0, 0, 'menu_background');
-        menuBackground.cameraOffset.setTo(game.camera.x + game.camera.width/2 - menuBackground.width,
-                                          game.camera.y + game.camera.height/2 - menuBackground.height);
+        menuBackground.scale.setTo(1.2);
+        //menuBackground.cameraOffset.setTo(game.camera.x + game.camera.width/2 - menuBackground.width,
+        //                                  game.camera.y + game.camera.height/2 - menuBackground.height);
+        menuBackground.x = game.camera.width/2 - menuBackground.width/2;
+        menuBackground.y = game.camera.height/2 - menuBackground.height/2;
+        menuBackground.fixedToCamera = true;
+        menuBackground.visible = false;
 
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(0, 0, 1500, 1500);
@@ -246,8 +253,12 @@
             }
 
             function drawPauseText() {
-                pauseText = game.add.bitmapText(game.width - 300, game.height / 2, 'carrier_command', 'PAUSE', 36);
+                pauseText = game.add.bitmapText(0, 0, 'carrier_command', 'PAUSE', 36);
+                pauseText.visible = false;
                 pauseText.fixedToCamera = true;
+                pauseText = game.add.bitmapText(menuBackground.x + menuBackground.width/2 - pauseText.width/2, menuBackground.y + menuBackground.height/6 - pauseText.height/2, 'carrier_command', 'PAUSE', 36);
+
+
             }
         }
 
