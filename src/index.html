@@ -5,6 +5,8 @@
     <title>Phaser - Making your first game, part 9</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
     <script src="./world/worldGenerator.js"></script>
+    <script src="./controller/KeyController.js"></script>
+    <script src="./math/Vector.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -21,27 +23,41 @@
     var blackholesGroup;
     var rayEmitter;
 
-    var game = new Phaser.Game(1000, 1000, Phaser.AUTO, 'phaser-example', {
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update,
         render: render
     });
+
+    // ----- GLOBAL VARIABLES ----- //
     var player;
+
+    var bmpText;
+    var prism;
+
+    var keyESC;
+    var keyENTER;
+    var keyLEFT;
+    var keyRIGHT;
+    var keyA;
+    var keyD;
+
+    var CURRENT_SPEED = 200;
+    // ----- ---------------- ----- //
+    // ---------- FLAGS ----------- //
+    var isPaused = false;
+    var isCompleted = false;
+
+    // ----- ---------------- ----- //
 
 
     function preload() {
 
         game.stage.backgroundColor = '#cfccd1';
-        //game.load.image('player', 'assets/sprites/spinObj_01.png');
-//        game.load.image('player', 'assets/sprites/onion.png');
-//        game.load.image('circle', 'assets/sprites/carrot.png');
-//        game.load.image('line', 'assets/sprites/vu.png');
-//        game.load.image('prism', 'assets/sprites/diamond.png');
-//        game.load.image('hole', 'assets/sprites/block.png');
         game.load.image('photon', 'assets/mana_small.png');
         game.load.image('mana', 'assets/photon_small.png');
-        game.load.image('line', 'assets/sprites/vu.png');
+        game.load.image('line', 'assets/line.png');
         game.load.image('prism', 'assets/sprites/diamond.png');
         game.load.image('hole', 'assets/blackhole_small.png');
         game.load.image('ray1', 'assets/light_ray/dust_small.png');
@@ -49,33 +65,34 @@
         game.load.image('background', 'assets/background.jpg');
 
 
-        // particles
+        // Particles
         game.load.spritesheet('balls', 'assets/sprites/balls.png', 17, 17);
-        // font
+        // Font
         game.load.bitmapFont('carrier_command', 'assets/fonts/bitmapFonts/carrier_command.png', 'assets/fonts/bitmapFonts/carrier_command.xml');
+
+        // Filters
+        game.load.script('gray', 'https://cdn.rawgit.com/photonstorm/phaser/master/v2/filters/Gray.js');
     }
 
-    var bmpText;
-    var prism;
+
 
     function create() {
-
-        game.add.tileSprite(-500, -500, 2000, 2000, 'background');
-
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(-500, -500, 1000, 1000);
 
+        game.add.tileSprite(-500, -500, 1000, 1000, 'background');
+
+
         //  The base of our player
         player = game.add.sprite(0, 0, 'photon');
-
         //  This will force the player to decelerate and limit its speed
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.physics.arcade.enable(player);
         player.body.drag.set(0.2);
         player.body.maxVelocity.setTo(400, 400);
         player.body.collideWorldBounds = true;
-        player.body.allowGravity = true;
-        player.scale.setTo(0.4, 0.4);
+        player.body.allowGravity = false;
+        player.scale.setTo(0.5, 0.5);
         player.anchor.setTo(0.5, 0.5);
 
         /*
@@ -84,23 +101,23 @@
         linex = lineGroup.create(10, 100, 'line');
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
         */
-
-        // Blackhole Group
-        blackholes = game.add.group();
-        blackholes.enableBody = true;
-        game.physics.enable(blackholes, Phaser.Physics.ARCADE);
+//
+//        // Blackhole Group
+//        blackholes = game.add.group();
+//        blackholes.enableBody = true;
+//        game.physics.enable(blackholes, Phaser.Physics.ARCADE);
 
         //createBlackhole(-400, -400, 4);
 
 
+//        game.physics.arcade.checkCollision.left = true;
+//        game.physics.arcade.checkCollision.right = true;
+
         player.bringToTop();
 
         game.camera.follow(player);
-        game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
-        game.camera.focusOnXY(0, 0);
-
-
-
+//        game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+//        game.camera.focusOnXY(0, 0);
 
 
         cursors = game.input.keyboard.createCursorKeys();
@@ -124,7 +141,7 @@
             game.world.width, game.world.height, 2, {threshold: 100}, {mana: manaGroup});
         game.physics.enable(manaGroup, Phaser.Physics.ARCADE);
         manaGroup.enableBody = true;
-        manaGroup.scale.setTo(0.5, 0.5);
+        //manaGroup.scale.setTo(0.5, 0.5);
 
         prismaGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
@@ -133,8 +150,9 @@
 
         lineGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 1, {threshold: 200}, {line: lineGroup});
+            game.world.width, game.world.height, 2, {threshold: 200}, {line: lineGroup});
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
+
 
         blackholesGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
@@ -153,64 +171,63 @@
 
         player.body.velocity.setTo(5, 0);
 
+
+        keyControllerInit(this);
         rayParticlesInit();
+
     }
 
-    var currentSpeed = 200;
+    // SetUp Hokey-functionality
+    function keyControllerInit(context) {
 
-    function update() {
+        var controller = new KeyController(context);
 
-        rayParticlesUpdate();
-        player.bringToTop();
+        keyESC = controller.registerKey(Phaser.Keyboard.ESC, onPressESC);
+        keyENTER = controller.registerKey(Phaser.Keyboard.ENTER, onPressENTER);
 
-        // update elapsed time
-        bmpText.text = 'TIME: ' + Math.round(game.time.now);
+        keyLEFT = controller.addKey(Phaser.Keyboard.LEFT);
+        keyRIGHT = controller.addKey(Phaser.Keyboard.RIGHT);
+        keyA = controller.addKey(Phaser.Keyboard.A);
+        keyD = controller.addKey(Phaser.Keyboard.D);
 
-        rel_x = game.world.width/player.body.x;
-        rel_y = game.world.height/player.body.y;
+        function onPressESC() {
+            if (!isPaused) {
+                isPaused = true;
 
-        //game.world.anchor.setTo(rel_x,rel_y);
-        if (cursors.left.isDown) {
-            player.angle += -4;
-            //game.world.angle += 4;
+                rayEmitter.on = false;
+                player.body.velocity.setTo(0, 0);
+
+            } else {
+                isPaused = false;
+
+                rayEmitter.on = true;
+
+            }
+        }
+
+        function onPressENTER() {
+
 
         }
-        else if (cursors.right.isDown) {
-            player.angle += 4;
-            //game.world.angle += -4;
-        }
-        game.camera.x = player.x;
-        game.camera.y = player.y;
+    }
 
+    function keyControllerUpdate() {
 
+        if (keyLEFT.isDown || keyA.isDown) player.angle -= 4;
+        if (keyRIGHT.isDown || keyD.isDown) player.angle += 4;
+    }
+    function collisionUpdate() {
 
-        /*
-        var cur_velocity = new Vector(player.body.velocity.x,player.body.velocity.y);
-        console.log(cur_velocity);
-        speed = cur_velocity.v_length();
+        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
 
-        angle = player.angle;
-        new_velo_x = cur_velocity.x * Math.cos(angle) - cur_velocity.y * Math.sin(angle);
-        new_velo_y = cur_velocity.x * Math.sin(angle) + cur_velocity.y * Math.cos(angle);
-
-        player.body.velocity.setTo(new_velo_x,new_velo_y);
-        console.log(player.body.velocity);
-        console.log("------------------------");
-        */
-
-
-        game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
-
+        game.physics.arcade.velocityFromRotation(player.rotation, CURRENT_SPEED, player.body.velocity);
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
-        game.physics.arcade.overlap(player, manaGroup, hitmana, null, this);
-        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
+        game.physics.arcade.overlap(player, manaGroup, hitMana, null, this);
         //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
         game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
         game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
-
-
     }
 
     function render() {
@@ -226,6 +243,8 @@
         rayEmitter.start(false, 5000, 5);
     }
     function rayParticlesUpdate() {
+        player.bringToTop();
+
         var px = player.body.velocity.x;
         var py = player.body.velocity.y;
         px *= 0.5;
@@ -238,61 +257,102 @@
         game.world.wrap(player, 4);
     }
 
+    function uiUpdate() {
+
+        // update elapsed time
+        bmpText.text = 'TIME: ' + Math.round(game.time.now);
+    }
+
+    function update() {
+
+        // Check for paused
+        if (isPaused) { return; }
+
+        keyControllerUpdate();
+        uiUpdate();
+
+        game.camera.x = player.x;
+        game.camera.y = player.y;
+
+
+        // TODO: Fix Speed!
+        /*
+        var cur_velocity = new Vector(player.body.velocity.x,player.body.velocity.y);
+        console.log(cur_velocity);
+        speed = cur_velocity.length();
+
+        angle = player.angle;
+        new_velo_x = cur_velocity.x * Math.cos(angle) - cur_velocity.y * Math.sin(angle);
+        new_velo_y = cur_velocity.x * Math.sin(angle) + cur_velocity.y * Math.cos(angle);
+
+        player.body.velocity.setTo(new_velo_x,new_velo_y);
+        console.log(player.body.velocity);
+        console.log("------------------------");
+        */
+
+        game.physics.arcade.velocityFromRotation(player.rotation, CURRENT_SPEED, player.body.velocity);
+
+        collisionUpdate();
+        rayParticlesUpdate();
+    }
+
+    function render() {
+
+    }
+
+    function hitMana(player, mana) {
+
+        mana.body.gravity.y = 2000;
+    }
+
     function hitLine(player, line) {
-//      player.body.velocity.setTo(-100, -100);
+      //player.body.velocity.setTo(-player.body.velocity.x, -player.body.velocity.y);
         player.angle *= -1.0;
 
-        //line.body.x += Math.floor(Math.random() * 40) - 15;
-        //line.body.y += Math.floor(Math.random() * 40) - 15;
+//        line.body.x += Math.floor(Math.random() * 40) - 15;
+//        line.body.y += Math.floor(Math.random() * 40) - 15;
 
+//        line.body.y += Math.floor(Math.random() * 40) - 15;
 
-        var emitter = game.add.emitter(player.body.x, player.body.y, 2);
+        var particles = 3;
+        emit(player.body.x, player.body.y, particles);
+    }
+
+    function emit(x, y, particles) {
+
+        var emitter = game.add.emitter(x, y, particles);
         emitter.makeParticles('balls', [0, 1, 2, 3, 4, 5]);
         emitter.minParticleSpeed.setTo(-600, -600);
         emitter.maxParticleSpeed.setTo(600, 600);
         emitter.gravity = 0;
-        //emitter.start(false, 400, 15);
+        emitter.start(false, 2000, 1);
 
-
-    }
-
-    function hitmana(player, mana) {
-//        player.body.velocity.setTo(-100, -100);
-        //console.log("hit mana");
-        mana.body.gravity.y = 2000;
-        //circle.body.bounce.y = 0.7 + Math.random() * 0.2;
-        /*
         setTimeout(function () {
-            circle.kill();
+            emitter.on = false;
         }, 1000);
-        */
-    }
 
+    }
     function hitPrisma(player, prisma) {
         var coefficient = 2;
-//      player.body.velocity.setTo(-100, -100);
         player.angle += 20 / coefficient * (-1);
 
         var c = Phaser.Color.getRandomColor(50, 255, 255);
 
-
         setTimeout(function () {
             game.stage.backgroundColor = c;
-            //player.tint = Math.random() * 0xffffff;
         }, 100);
     }
-
-
-    var GRAVITY = 1728000;
-    var MAX_GRAVITY = 180;
-
     function hitBlackhole(player, blackhole) {
+
+        var GRAVITY = 1728000;
+        var MAX_GRAVITY = 180;
+
         middle_x = blackhole.x + blackhole.body.width / 2;
         middle_y = blackhole.y + blackhole.body.height / 2;
 
         var g = new Vector(middle_x - player.body.x, middle_y - player.body.y);
 
-        distance = g.v_length();
+        var distance = g.length();
 
         cur_gravity = (1 / (distance * distance)) * GRAVITY;
 
@@ -300,56 +360,24 @@
             cur_gravity = MAX_GRAVITY;
         }
 
-        //console.log("Current Gravity" + cur_gravity);
-        //cur_gravity = GRAVITY;
-
-        //console.log("Distanz" + distance);
-
-
-        normalize(g);
+        g = g.normalize();
 
         g.x *= cur_gravity;
         g.y *= cur_gravity;
 
-        //console.log(player.body.velocity);
+        console.log(player.body.velocity);
 
         new_x = g.x + player.body.velocity.x;
         new_y = g.y + player.body.velocity.y;
 
-
         player.body.velocity.setTo(new_x, new_y);
-        //console.log(player.body.velocity);
-        //console.log("----------------");
     }
-    /*
+
     function createBlackhole(x, y, scale) {
 
         var sprite = blackholes.create(x, y, 'blackhole');
-//        game.physics.arcade.enable(sprite);
-
         if (scale === undefined) scale = 1;
-
         sprite.scale.setTo(scale, scale);
-    }
-    */
-
-
-    function normalize(point) {
-
-        var len = Math.sqrt(point.x * point.x + point.y * point.y);
-        point.x /= len;
-        point.y /= len;
-    }
-
-    function Vector(x, y) {
-
-        this.x = x;
-        this.y = y;
-
-        this.v_length = function () {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
-        }
-
     }
 
 </script>
