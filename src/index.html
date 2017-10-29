@@ -40,6 +40,7 @@
     var keyENTER;
     var keyLEFT;
     var keyRIGHT;
+    var keySPACE;
     var keyA;
     var keyD;
 
@@ -203,6 +204,7 @@
 
         keyLEFT = controller.addKey(Phaser.Keyboard.LEFT);
         keyRIGHT = controller.addKey(Phaser.Keyboard.RIGHT);
+        keySPACE= game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         keyA = controller.addKey(Phaser.Keyboard.A);
         keyD = controller.addKey(Phaser.Keyboard.D);
 
@@ -229,8 +231,36 @@
 
     function keyControllerUpdate() {
 
-        if (keyLEFT.isDown || keyA.isDown) player.angle -= 4;
-        if (keyRIGHT.isDown || keyD.isDown) player.angle += 4;
+        const angle = 0.1;
+        const time_to_reset = 1000;
+
+        if (keyLEFT.isDown || keyA.isDown) {
+            player.angle -= 4;
+            game.world.angle -= angle;
+
+            setTimeout(function () {
+                game.world.angle += angle;
+            }, time_to_reset);
+        }
+        if (keyRIGHT.isDown || keyD.isDown) {
+            player.angle += 4;
+            game.world.angle += angle;
+
+                setTimeout(function () {
+                    game.world.angle -= angle;
+                }, time_to_reset);
+        }
+
+        if (keySPACE.isDown) {
+//            const time_to_reset = 100;
+//            const boost = 25;
+//            player.body.velocity.setTo(1000, 1000);
+//
+//            setTimeout(function () {
+//                player.body.velocity.setTo(-boost, -boost);
+//
+//            }, time_to_reset);
+        }
     }
     function collisionUpdate() {
 
