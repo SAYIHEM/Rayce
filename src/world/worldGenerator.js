@@ -25,7 +25,7 @@ function generateObstackleSections(x,y,width,height, recursionCounter, options, 
 
             var elem = types[currKey].create(x + width / 2.0, y + height / 2.0, currKey);
             elem.inputEnabled = true;
-            elem.input.enableDrag(true);
+            //elem.input.enableDrag(true);
         }
     } else {
         //var ratio = 0.5 + Math.random()* 1.5;
@@ -41,5 +41,26 @@ function generateObstackleSections(x,y,width,height, recursionCounter, options, 
         generateObstackleSections( x+splitXLeft, y, k*splitXRight, k*splitYLeft, recursionCounter - 1, options, types);
         generateObstackleSections( x, y+splitYLeft, k*splitXLeft, k*splitYRight, recursionCounter - 1, options, types);
         generateObstackleSections( x+splitXLeft, y+splitYLeft, k*splitXRight, k*splitYRight, recursionCounter - 1, options, types);
+    }
+}
+function generateObstacles(type,group,world,amount) {
+    var height = world.height;
+    var width = world.width;
+
+    for (var i=0;i<amount;i++) {
+        var next_rand_x = Math.floor(Math.random() * width);
+        var next_rand_y = Math.floor(Math.random() * height);
+        console.log("X: " + next_rand_x + " Y: " + next_rand_y);
+
+        var element = group.create(next_rand_x,next_rand_y,type);
+
+        if (element.width>width - next_rand_x) {
+            element.kill();
+            console.log("killed");
+        }
+        if (element.height>height - next_rand_y) {
+            element.kill();
+            console.log("killed");
+        }
     }
 }
