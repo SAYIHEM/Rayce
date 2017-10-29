@@ -139,10 +139,6 @@
 
         manaGroup = game.add.group();
 
-        /*
-        generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 2, {threshold: 100}, {mana: manaGroup});
-            */
 
         generateObstacles('mana',manaGroup,game.world,60);
 
@@ -155,29 +151,18 @@
 
         generateObstacles('prism',prismaGroup,game.world,40);
 
-        /*
-        generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 2, {threshold: 100}, {prism: prismaGroup});
-        generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 2, {threshold: 200}, {line: lineGroup});
-            */
+
 
         game.physics.enable(prismaGroup, Phaser.Physics.ARCADE);
 
         lineGroup = game.add.group();
         generateObstacles('line',lineGroup,game.world,20);
 
-
-
-
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
 
 
         blackholesGroup = game.add.group();
-        /*
-        generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 1, {threshold: 100}, {hole: blackholesGroup});
-            */
+
         generateObstacles('hole',blackholesGroup,game.world,20);
         game.physics.enable(blackholesGroup, Phaser.Physics.ARCADE);
 
