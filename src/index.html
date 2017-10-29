@@ -85,6 +85,10 @@
 
     function create() {
 
+        game.time.advancedTiming = true;
+        game.time.desiredFps = 60;
+        game.time.slowMotion = 1.0;
+
         // Create Filter
         filterGrey = game.add.filter('Gray');
 
@@ -256,7 +260,7 @@
     function keyControllerUpdate() {
 
         const angle = 0.1;
-        const time_to_reset = 1000;
+        const time_to_reset = 500;
 
         if (keyLEFT.isDown || keyA.isDown) {
             player.angle -= 4;
@@ -276,14 +280,10 @@
         }
 
         if (keySPACE.isDown) {
-//            const time_to_reset = 100;
-//            const boost = 25;
-//            player.body.velocity.setTo(1000, 1000);
-//
-//            setTimeout(function () {
-//                player.body.velocity.setTo(-boost, -boost);
-//
-//            }, time_to_reset);
+          game.time.slowMotion = 0.5;
+            setTimeout(function () {
+                game.time.slowMotion = 1.0;
+            }, 500);
         }
     }
 
@@ -327,6 +327,7 @@
     }
 
     function update() {
+
 
         //console.log(player.body.x);
         //console.log(player.body.y);
@@ -393,9 +394,15 @@
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
 
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
-
+        game.time.slowMotion = 1.5;
+        setTimeout(function () {
+            game.time.slowMotion = 1.0;
+        }, 500);
         var particles = 3;
         emit(player.body.x, player.body.y, particles);
+
+
+
     }
 
     function emit(x, y, particles) {
