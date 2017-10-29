@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Phaser - Making your first game, part 9</title>
-    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
-    <script src="./controller/KeyController.js"></script>
-    <script src="./obstacles/collectables/poweruplist.js"></script>
-    <script src="./math/Vector.js"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <title>Phaser - Making your first game, part 9</title>
+  <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+  <script src="./controller/KeyController.js"></script>
+  <script src="./obstacles/collectables/poweruplist.js"></script>
+  <script src="./math/Vector.js"></script>
+  <style type="text/css">
+    body {
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
 
@@ -95,7 +95,7 @@
         game.load.audio('sfx', 'assets/audio/SoundEffects/fx_mixdown.ogg');
 
         game.load.audio('blaster', 'assets/audio/SoundEffects/blaster.mp3');
-        game.load.audio('loop', 'assets/audio/oedipus_ark_pandora.mp3');
+        game.load.audio('loop', 'resources/sounds/loop.mp3');
     }
 
     function soundStopped(sound) {
@@ -150,8 +150,8 @@
         menuBackground.scale.setTo(1.2);
         //menuBackground.cameraOffset.setTo(game.camera.x + game.camera.width/2 - menuBackground.width,
         //                                  game.camera.y + game.camera.height/2 - menuBackground.height);
-        menuBackground.x = game.camera.width/2 - menuBackground.width/2;
-        menuBackground.y = game.camera.height/2 - menuBackground.height/2;
+        menuBackground.x = game.camera.width / 2 - menuBackground.width / 2;
+        menuBackground.y = game.camera.height / 2 - menuBackground.height / 2;
         menuBackground.fixedToCamera = true;
         menuBackground.visible = false;
 
@@ -218,7 +218,7 @@
 
         manaGroup = game.add.group();
 
-        generateObstacles('mana',manaGroup,game.world,60);
+        generateObstacles('mana', manaGroup, game.world, 60);
 
         game.physics.enable(manaGroup, Phaser.Physics.ARCADE);
 
@@ -227,19 +227,19 @@
 
         prismaGroup = game.add.group();
 
-        generateObstacles('prism',prismaGroup,game.world,40);
+        generateObstacles('prism', prismaGroup, game.world, 40);
 
         game.physics.enable(prismaGroup, Phaser.Physics.ARCADE);
 
         lineGroup = game.add.group();
-        generateObstacles('line',lineGroup,game.world,20);
+        generateObstacles('line', lineGroup, game.world, 20);
 
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
 
 
         blackholesGroup = game.add.group();
 
-        generateObstacles('hole',blackholesGroup,game.world,10);
+        generateObstacles('hole', blackholesGroup, game.world, 10);
         game.physics.enable(blackholesGroup, Phaser.Physics.ARCADE);
 
 
@@ -261,13 +261,13 @@
 
         menuBackground.bringToTop();
 
-        powerUpList = new PowerUpList(lol,game);
+        powerUpList = new PowerUpList(lol, game);
         powerUpList.show();
 
-       // game.sound.setDecodedCallback([ blaster ], create, this);
+        // game.sound.setDecodedCallback([ blaster ], create, this);
     }
 
-    lol = function() {
+    lol = function () {
 
     };
 
@@ -282,7 +282,7 @@
 
         keyLEFT = controller.addKey(Phaser.Keyboard.LEFT);
         keyRIGHT = controller.addKey(Phaser.Keyboard.RIGHT);
-        keySPACE= game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        keySPACE = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         keyA = controller.addKey(Phaser.Keyboard.A);
         keyD = controller.addKey(Phaser.Keyboard.D);
 
@@ -320,7 +320,7 @@
                 pauseText = game.add.bitmapText(0, 0, 'carrier_command', 'PAUSE', 36);
                 pauseText.visible = false;
                 pauseText.fixedToCamera = true;
-                pauseText = game.add.bitmapText(menuBackground.x + menuBackground.width/2 - pauseText.width/2, menuBackground.y + menuBackground.height/6 - pauseText.height/2, 'carrier_command', 'PAUSE', 36);
+                pauseText = game.add.bitmapText(menuBackground.x + menuBackground.width / 2 - pauseText.width / 2, menuBackground.y + menuBackground.height / 6 - pauseText.height / 2, 'carrier_command', 'PAUSE', 36);
 
 
             }
@@ -349,16 +349,16 @@
             player.angle += 4;
             game.world.angle += angle;
 
-                setTimeout(function () {
-                    game.world.angle -= angle;
-                }, time_to_reset);
+            setTimeout(function () {
+                game.world.angle -= angle;
+            }, time_to_reset);
         }
 
         if (keySPACE.isDown) {
-          game.time.slowMotion = 0.5;
-          blaster.play();
+            game.time.slowMotion = 0.5;
+            blaster.play();
 
-          setTimeout(function () {
+            setTimeout(function () {
                 game.time.slowMotion = 1.0;
             }, 500);
         }
@@ -371,12 +371,13 @@
 
     function rayParticlesInit() {
         rayEmitter = game.add.emitter(game.world.centerX, game.world.centerY, 400);
-        rayEmitter.makeParticles( [ 'ray1', 'ray2' ] );
+        rayEmitter.makeParticles(['ray1', 'ray2']);
         rayEmitter.gravity = 0;
         rayEmitter.setAlpha(1, 0, 3000);
         rayEmitter.setScale(0.3, 0.1, 0.3, 0.1, 2500);
         rayEmitter.start(false, 5000, 5);
     }
+
     function rayParticlesUpdate() {
         player.bringToTop();
 
@@ -395,187 +396,191 @@
     function uiUpdate() {
 
         // update elapsed time
+        var time = game.time.now;
         bmpText.text = 'TIME: ' + Math.round(game.time.now);
-        if (game.time.now % 1000 === 0) {
-            CURRENT_SPEED+=10;
+        if (time % 1000 === 0) {
+            CURRENT_SPEED += 5;
 
-            // play a sound
-//            blaster.play();
-//            console.log("yupp");
+            //play a sound
+//            fx.play('ping');
+//            console.log("bllaa");
+//        }
+
+            game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width / 2 + game.width / 2, player.body.height / 2 + game.height / 2);
+        }
+    }
+
+        function update() {
+
+
+            //console.log(player.body.x);
+            //console.log(player.body.y);
+
+            // Check for paused
+            if (isPaused) {
+                return;
+            }
+
+            keyControllerUpdate();
+            uiUpdate();
+
+            game.camera.x = player.x;
+            game.camera.y = player.y;
+
+
+            // TODO: Fix Speed!
+            /*
+            var cur_velocity = new Vector(player.body.velocity.x,player.body.velocity.y);
+            console.log(cur_velocity);
+            speed = cur_velocity.length();
+
+            angle = player.angle;
+            new_velo_x = cur_velocity.x * Math.cos(angle) - cur_velocity.y * Math.sin(angle);
+            new_velo_y = cur_velocity.x * Math.sin(angle) + cur_velocity.y * Math.cos(angle);
+
+            player.body.velocity.setTo(new_velo_x,new_velo_y);
+            console.log(player.body.velocity);
+            console.log("------------------------");
+            */
+
+
+            collisionUpdate();
+            rayParticlesUpdate();
         }
 
-        game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width/2 + game.width / 2,player.body.height/2 + game.height / 2);
-    }
+        function collisionUpdate() {
 
-    function update() {
+            game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
 
+            game.physics.arcade.velocityFromRotation(player.rotation, CURRENT_SPEED, player.body.velocity);
 
-        //console.log(player.body.x);
-        //console.log(player.body.y);
+            //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+            //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
+            game.physics.arcade.overlap(player, manaGroup, hitMana, null, this);
+            //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
+            game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
+            game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
+        }
 
-        // Check for paused
-        if (isPaused) { return; }
+        function render() {
 
-        keyControllerUpdate();
-        uiUpdate();
+        }
 
-        game.camera.x = player.x;
-        game.camera.y = player.y;
+        function hitMana(player, mana) {
 
+            mana.body.gravity.y = 2000;
+            powerUpList.addLoad();
 
-        // TODO: Fix Speed!
-        /*
-        var cur_velocity = new Vector(player.body.velocity.x,player.body.velocity.y);
-        console.log(cur_velocity);
-        speed = cur_velocity.length();
+        }
 
-        angle = player.angle;
-        new_velo_x = cur_velocity.x * Math.cos(angle) - cur_velocity.y * Math.sin(angle);
-        new_velo_y = cur_velocity.x * Math.sin(angle) + cur_velocity.y * Math.cos(angle);
-
-        player.body.velocity.setTo(new_velo_x,new_velo_y);
-        console.log(player.body.velocity);
-        console.log("------------------------");
-        */
-
-
-
-        collisionUpdate();
-        rayParticlesUpdate();
-    }
-
-    function collisionUpdate() {
-
-        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
-
-        game.physics.arcade.velocityFromRotation(player.rotation, CURRENT_SPEED, player.body.velocity);
-
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
-        game.physics.arcade.overlap(player, manaGroup, hitMana, null, this);
-        //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
-        game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
-        game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
-    }
-
-    function render() {
-
-    }
-
-    function hitMana(player, mana) {
-
-        mana.body.gravity.y = 2000;
-        powerUpList.addLoad();
-
-    }
-
-    function hitLine(player, line) {
-      //player.body.velocity.setTo(-player.body.velocity.x, -player.body.velocity.y);
-        player.angle *= -1.0;
+        function hitLine(player, line) {
+            //player.body.velocity.setTo(-player.body.velocity.x, -player.body.velocity.y);
+            player.angle *= -1.0;
 
 //        line.body.x += Math.floor(Math.random() * 40) - 15;
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
 
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
-        game.time.slowMotion = 1.5;
-        fx.play('ping');
-        setTimeout(function () {
-            game.time.slowMotion = 1.0;
-        }, 500);
-        var particles = 3;
-        emit(player.body.x, player.body.y, particles);
+            game.time.slowMotion = 1.5;
+            //fx.play('ping');
+            setTimeout(function () {
+                game.time.slowMotion = 1.0;
+            }, 500);
+            var particles = 3;
+            emit(player.body.x, player.body.y, particles);
 
 
-
-    }
-
-    function emit(x, y, particles) {
-
-        var emitter = game.add.emitter(x, y, particles);
-        emitter.makeParticles('balls', [0, 1, 2, 3, 4, 5]);
-        emitter.minParticleSpeed.setTo(-600, -600);
-        emitter.maxParticleSpeed.setTo(600, 600);
-        emitter.gravity = 0;
-        emitter.start(false, 2000, 1);
-
-        setTimeout(function () {
-            emitter.on = false;
-        }, 1000);
-
-    }
-    function hitPrisma(player, prisma) {
-        var coefficient = 2;
-        player.angle += 20 / coefficient * (-1);
-
-        var c = Phaser.Color.getRandomColor(50, 255, 255);
-
-        setTimeout(function () {
-            game.stage.backgroundColor = c;
-        }, 100);
-    }
-    function hitBlackhole(player, blackhole) {
-
-        var GRAVITY = 2000000;
-        var MAX_GRAVITY = 300;
-
-        middle_x = blackhole.x + blackhole.body.width / 2;
-        middle_y = blackhole.y + blackhole.body.height / 2;
-
-        var g = new Vector(middle_x - player.body.x, middle_y - player.body.y);
-
-        var distance = g.length();
-
-        cur_gravity = (1 / (distance * distance)) * GRAVITY;
-
-        if (cur_gravity > MAX_GRAVITY) {
-            cur_gravity = MAX_GRAVITY;
         }
 
-        g = g.normalize();
+        function emit(x, y, particles) {
 
-        g.x *= cur_gravity;
-        g.y *= cur_gravity;
+            var emitter = game.add.emitter(x, y, particles);
+            emitter.makeParticles('balls', [0, 1, 2, 3, 4, 5]);
+            emitter.minParticleSpeed.setTo(-600, -600);
+            emitter.maxParticleSpeed.setTo(600, 600);
+            emitter.gravity = 0;
+            emitter.start(false, 2000, 1);
 
-        //console.log(player.body.velocity);
+            setTimeout(function () {
+                emitter.on = false;
+            }, 1000);
 
-        new_x = g.x + player.body.velocity.x;
-        new_y = g.y + player.body.velocity.y;
-
-        player.body.velocity.setTo(new_x, new_y);
-
-        // end game
-        //fx.play('death');
-
-    }
-
-    function createBlackhole(x, y, scale) {
-
-        var sprite = blackholes.create(x, y, 'blackhole');
-        if (scale === undefined) scale = 1;
-        sprite.scale.setTo(scale, scale);
-    }
-
-    generateObstacles = function(type,group,world,amount) {
-        var height = world.height;
-        var width = world.width;
-
-        for (var i=0;i<amount;i++) {
-            var next_rand_x = Math.floor(Math.random() * width);
-            var next_rand_y = Math.floor(Math.random() * height);
-            //console.log("X: " + next_rand_x + " Y: " + next_rand_y);
-
-            var element = group.create(next_rand_x,next_rand_y,type);
-
-            if (element.width>width - next_rand_x) {
-                element.kill();
-                //console.log("killed");
-            }
-            if (element.height>height - next_rand_y) {
-                element.kill();
-                //console.log("killed");
-            }
         }
-    };
+
+        function hitPrisma(player, prisma) {
+            var coefficient = 2;
+            player.angle += 20 / coefficient * (-1);
+
+            var c = Phaser.Color.getRandomColor(50, 255, 255);
+
+            setTimeout(function () {
+                game.stage.backgroundColor = c;
+            }, 100);
+        }
+
+        function hitBlackhole(player, blackhole) {
+
+            var GRAVITY = 2000000;
+            var MAX_GRAVITY = 300;
+
+            middle_x = blackhole.x + blackhole.body.width / 2;
+            middle_y = blackhole.y + blackhole.body.height / 2;
+
+            var g = new Vector(middle_x - player.body.x, middle_y - player.body.y);
+
+            var distance = g.length();
+
+            cur_gravity = (1 / (distance * distance)) * GRAVITY;
+
+            if (cur_gravity > MAX_GRAVITY) {
+                cur_gravity = MAX_GRAVITY;
+            }
+
+            g = g.normalize();
+
+            g.x *= cur_gravity;
+            g.y *= cur_gravity;
+
+            //console.log(player.body.velocity);
+
+            new_x = g.x + player.body.velocity.x;
+            new_y = g.y + player.body.velocity.y;
+
+            player.body.velocity.setTo(new_x, new_y);
+
+            // end game
+            //fx.play('death');
+
+        }
+
+        function createBlackhole(x, y, scale) {
+
+            var sprite = blackholes.create(x, y, 'blackhole');
+            if (scale === undefined) scale = 1;
+            sprite.scale.setTo(scale, scale);
+        }
+
+        generateObstacles = function (type, group, world, amount) {
+            var height = world.height;
+            var width = world.width;
+
+            for (var i = 0; i < amount; i++) {
+                var next_rand_x = Math.floor(Math.random() * width);
+                var next_rand_y = Math.floor(Math.random() * height);
+                //console.log("X: " + next_rand_x + " Y: " + next_rand_y);
+
+                var element = group.create(next_rand_x, next_rand_y, type);
+
+                if (element.width > width - next_rand_x) {
+                    element.kill();
+                    //console.log("killed");
+                }
+                if (element.height > height - next_rand_y) {
+                    element.kill();
+                    //console.log("killed");
+                }
+            }
+        };
 
 </script>
 
