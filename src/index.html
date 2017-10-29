@@ -166,11 +166,7 @@
         generateObstacles('hole',blackholesGroup,game.world,20);
         game.physics.enable(blackholesGroup, Phaser.Physics.ARCADE);
 
-        // disable drag
-        disableDraggableGroup(manaGroup);
-        disableDraggableGroup(prismaGroup);
-        disableDraggableGroup(lineGroup);
-        disableDraggableGroup(blackholesGroup);
+
 
 
         player.bringToTop();
@@ -190,16 +186,7 @@
         rayParticlesInit();
 
     }
-    function disableDraggableGroup ( g ) {
-        g.forEach( makeDraggable )
-    }
 
-    function makeDraggable ( obj ) {
-        if ( obj.inputEnabled === undefined ) return;
-
-        obj.inputEnabled = false
-
-    }
 
     // SetUp Hokey-functionality
     function keyControllerInit(context) {
