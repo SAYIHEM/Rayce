@@ -125,17 +125,44 @@ class PowerUpList {
         }
     }
     addLoad() {
+        //console.log(this.mElements);
+        //console.log(this.curAmount);
+
+
         if (this.curAmount<this.MAX_ELEMENTS) {
             //fill next powerup
-            var empty_sprite = this.mElements.get(this.curAmount);
-            var x = empty_sprite.body.x;
-            var y = empty_sprite.body.y;
+            var empty_sprite = this.mElements[this.curAmount];
+            var x = empty_sprite.x;
+            var y = empty_sprite.y;
+
+
+            //console.log(scale);
+
+            var empty_sprite_width = empty_sprite.width;
+            var empty_sprite_height = empty_sprite.height;
+            var empty_sprite_x = empty_sprite.x;
+            var empty_sprite_y = empty_sprite.y;
+
+            empty_sprite.kill();
 
             var filled_sprite = this.mGame.add.sprite(x, y, 'powerup_f');
 
-            var cur_width = filled_sprite.body.width;
-            var scale = cur_width/empty_sprite.body.width;
+            var cur_width = filled_sprite.width;
+            var scale = empty_sprite_width/cur_width;
+
             filled_sprite.scale.setTo(scale,scale);
+
+
+            filled_sprite.fixedToCamera = true;
+
+            this.mElements[this.curAmount] = filled_sprite;
+
+            console.log("old x: " + empty_sprite_x + " new x: " + filled_sprite.x);
+            console.log("old y: " + empty_sprite_y + " new y: " + filled_sprite.y);
+
+            console.log("old width " + empty_sprite_width + " new width " + filled_sprite.width);
+            console.log("old height " + empty_sprite_height + " new height " + filled_sprite.height);
+
 
             this.curAmount++;
             if (this.curAmount===this.MAX_ELEMENTS) {
@@ -145,6 +172,11 @@ class PowerUpList {
     }
 
     clear() {
+        for (var i=0;i<this.curAmount;i++) {
+            var element = this.mElements.pop();
+            element.kill();
+        }
+
         this.curAmount = 0;
         //reset all sprides to empty
     }

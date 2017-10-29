@@ -41,6 +41,8 @@
 
     var menuBackground;
 
+    var powerUpList;
+
     // Keys
     var keyESC;
     var keyENTER;
@@ -340,8 +342,8 @@
 
         // update elapsed time
         bmpText.text = 'TIME: ' + Math.round(game.time.now);
-        if (game.time.now%1000===0) {
-            CURRENT_SPEED+=10;
+        if (game.time.now%10000===0) {
+            CURRENT_SPEED+=5;
         }
 
         game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width/2 + game.width / 2,player.body.height/2 + game.height / 2);
@@ -405,6 +407,8 @@
     function hitMana(player, mana) {
 
         mana.body.gravity.y = 2000;
+        powerUpList.addLoad();
+
     }
 
     function hitLine(player, line) {
@@ -452,8 +456,8 @@
     }
     function hitBlackhole(player, blackhole) {
 
-        var GRAVITY = 1728000;
-        var MAX_GRAVITY = 180;
+        var GRAVITY = 2000000;
+        var MAX_GRAVITY = 300;
 
         middle_x = blackhole.x + blackhole.body.width / 2;
         middle_y = blackhole.y + blackhole.body.height / 2;
@@ -473,7 +477,7 @@
         g.x *= cur_gravity;
         g.y *= cur_gravity;
 
-        console.log(player.body.velocity);
+        //console.log(player.body.velocity);
 
         new_x = g.x + player.body.velocity.x;
         new_y = g.y + player.body.velocity.y;
@@ -487,6 +491,7 @@
         if (scale === undefined) scale = 1;
         sprite.scale.setTo(scale, scale);
     }
+
     generateObstacles = function(type,group,world,amount) {
         var height = world.height;
         var width = world.width;
