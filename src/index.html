@@ -23,7 +23,7 @@
     var blackholesGroup;
     var rayEmitter;
 
-    var game = new Phaser.Game(1920, 1080, Phaser.AUTO, 'phaser-example', {
+    var game = new Phaser.Game(2000, 1000, Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update,
@@ -75,12 +75,12 @@
         game.load.image('menu_background', 'assets/prism2_cut.png');
         game.load.image('photon', 'assets/mana_small.png');
         game.load.image('mana', 'assets/photon_small.png');
+        game.load.image('stars', 'assets/stars_sc.png');
         game.load.image('line', 'assets/line.png');
         game.load.image('prism', 'assets/sprites/diamond.png');
         game.load.image('hole', 'assets/blackhole_small.png');
         game.load.image('ray1', 'assets/light_ray/dust_small.png');
         game.load.image('ray2', 'assets/light_ray/stars_small.png');
-        game.load.image('stars', 'assets/stars_sc.png');
         game.load.image('background', 'assets/background.jpg');
         game.load.image('powerup_e', 'assets/powerup_empty.png');
         game.load.image('powerup_f', 'assets/powerup_fill.png');
@@ -96,7 +96,9 @@
         game.load.audio('sfx', 'assets/audio/SoundEffects/fx_mixdown.ogg');
 
         game.load.audio('blaster', 'assets/audio/SoundEffects/blaster.mp3');
-        game.load.audio('loop', 'assets/audio/oedipus_ark_pandora.mp3');
+        //game.load.audio('loop', 'assets/audio/oedipus_ark_pandora.mp3');
+        game.load.audio('loop', 'assets/loop.mp3');
+
     }
 
     function soundStopped(sound) {
@@ -289,7 +291,19 @@
 
         function onPressESC() {
             if (!isPaused) {
-                pauseGame();
+                isPaused = true;
+
+                game.world.filters = [filterGrey];
+                rayEmitter.on = false;
+                bmpText.visible = false;
+                drawPauseText();
+                pauseText.visible = true;
+
+                menuBackground.visible = true;
+
+                player.body.velocity.setTo(0, 0);
+
+                loop.pause();
 
             } else {
                 isPaused = false;
@@ -305,37 +319,20 @@
 
             }
 
+            function drawPauseText() {
+                pauseText = game.add.bitmapText(0, 0, 'carrier_command', 'PAUSE', 36);
+                pauseText.visible = false;
+                pauseText.fixedToCamera = true;
+                pauseText = game.add.bitmapText(menuBackground.x + menuBackground.width / 2 - pauseText.width / 2, menuBackground.y + menuBackground.height / 6 - pauseText.height / 2, 'carrier_command', 'PAUSE', 36);
+
+
+            }
         }
 
         function onPressENTER() {
 
 
         }
-    }
-
-    function drawPauseText() {
-        pauseText = game.add.bitmapText(0, 0, 'carrier_command', 'PAUSE', 36);
-        pauseText.visible = false;
-        pauseText.fixedToCamera = true;
-        pauseText = game.add.bitmapText(menuBackground.x + menuBackground.width/2 - pauseText.width/2, menuBackground.y + menuBackground.height/6 - pauseText.height/2, 'carrier_command', 'PAUSE', 36);
-
-
-    }
-
-    function pauseGame() {
-        isPaused = true;
-
-        game.world.filters = [filterGrey];
-        rayEmitter.on = false;
-        bmpText.visible = false;
-        drawPauseText();
-        pauseText.visible = true;
-
-        menuBackground.visible = true;
-
-        player.body.velocity.setTo(0, 0);
-
-        loop.pause();
     }
 
     function keyControllerUpdate() {
@@ -398,6 +395,7 @@
         }, 1000);
 
     }
+
 
 
     function rayParticlesUpdate() {
@@ -486,8 +484,9 @@
     }
 
     function hitMana(player, mana) {
-        mana.body.gravity.y = 2000;
-        powerUpList.addLoad();
+
+            mana.body.gravity.y = 2000;
+            powerUpList.addLoad();
 
     }
 
@@ -510,6 +509,7 @@
 
 
     }
+
 
 
     function hitPrisma(player, prisma) {
@@ -557,6 +557,12 @@
 
     }
 
+        function createBlackhole(x, y, scale) {
+
+            var sprite = blackholes.create(x, y, 'blackhole');
+            if (scale === undefined) scale = 1;
+            sprite.scale.setTo(scale, scale);
+        }
 
     generateObstacles = function(type,group,world,amount) {
         var height = world.height;
