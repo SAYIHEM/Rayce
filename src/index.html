@@ -35,6 +35,8 @@
 
     var bmpText;
     var pauseText;
+    var continueText;
+    var restartText;
     var prism;
 
     var menuBackground;
@@ -88,14 +90,23 @@
 
     function create() {
 
+        game.time.advancedTiming = true;
+        game.time.desiredFps = 60;
+        game.time.slowMotion = 1.0;
+
         // Create Filter
         filterGrey = game.add.filter('Gray');
 
 
         // Create MenuBackground sprite
         menuBackground = game.add.sprite(0, 0, 'menu_background');
-        menuBackground.cameraOffset.setTo(game.camera.x + game.camera.width/2 - menuBackground.width,
-                                          game.camera.y + game.camera.height/2 - menuBackground.height);
+        menuBackground.scale.setTo(1.2);
+        //menuBackground.cameraOffset.setTo(game.camera.x + game.camera.width/2 - menuBackground.width,
+        //                                  game.camera.y + game.camera.height/2 - menuBackground.height);
+        menuBackground.x = game.camera.width/2 - menuBackground.width/2;
+        menuBackground.y = game.camera.height/2 - menuBackground.height/2;
+        menuBackground.fixedToCamera = true;
+        menuBackground.visible = false;
 
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(0, 0, 1500, 1500);
@@ -252,8 +263,12 @@
             }
 
             function drawPauseText() {
-                pauseText = game.add.bitmapText(game.width - 300, game.height / 2, 'carrier_command', 'PAUSE', 36);
+                pauseText = game.add.bitmapText(0, 0, 'carrier_command', 'PAUSE', 36);
+                pauseText.visible = false;
                 pauseText.fixedToCamera = true;
+                pauseText = game.add.bitmapText(menuBackground.x + menuBackground.width/2 - pauseText.width/2, menuBackground.y + menuBackground.height/6 - pauseText.height/2, 'carrier_command', 'PAUSE', 36);
+
+
             }
         }
 
@@ -266,7 +281,7 @@
     function keyControllerUpdate() {
 
         const angle = 0.1;
-        const time_to_reset = 1000;
+        const time_to_reset = 500;
 
         if (keyLEFT.isDown || keyA.isDown) {
             player.angle -= 4;
@@ -286,14 +301,10 @@
         }
 
         if (keySPACE.isDown) {
-//            const time_to_reset = 100;
-//            const boost = 25;
-//            player.body.velocity.setTo(1000, 1000);
-//
-//            setTimeout(function () {
-//                player.body.velocity.setTo(-boost, -boost);
-//
-//            }, time_to_reset);
+          game.time.slowMotion = 0.5;
+            setTimeout(function () {
+                game.time.slowMotion = 1.0;
+            }, 500);
         }
     }
 
@@ -337,6 +348,7 @@
     }
 
     function update() {
+
 
         //console.log(player.body.x);
         //console.log(player.body.y);
@@ -403,9 +415,15 @@
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
 
 //        line.body.y += Math.floor(Math.random() * 40) - 15;
-
+        game.time.slowMotion = 1.5;
+        setTimeout(function () {
+            game.time.slowMotion = 1.0;
+        }, 500);
         var particles = 3;
         emit(player.body.x, player.body.y, particles);
+
+
+
     }
 
     function emit(x, y, particles) {
