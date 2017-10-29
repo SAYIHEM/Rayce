@@ -5,6 +5,7 @@
     <title>Phaser - Making your first game, part 9</title>
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
     <script src="./controller/KeyController.js"></script>
+    <script src="./obstacles/collectables/poweruplist.js"></script>
     <script src="./math/Vector.js"></script>
     <style type="text/css">
         body {
@@ -71,6 +72,8 @@
         game.load.image('ray1', 'assets/light_ray/dust_small.png');
         game.load.image('ray2', 'assets/light_ray/stars_small.png');
         game.load.image('background', 'assets/background.jpg');
+        game.load.image('powerup_e', 'assets/powerup_empty.png');
+        game.load.image('powerup_f', 'assets/powerup_fill.png');
 
         // Particles
         game.load.spritesheet('balls', 'assets/sprites/balls.png', 17, 17);
@@ -199,7 +202,14 @@
         rayParticlesInit();
 
         menuBackground.bringToTop();
+
+        powerUpList = new PowerUpList(lol,game);
+        powerUpList.show();
     }
+
+    lol = function() {
+
+    };
 
 
     // SetUp Hokey-functionality
