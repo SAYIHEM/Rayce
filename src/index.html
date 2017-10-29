@@ -21,7 +21,7 @@
     var blackholesGroup;
     var rayEmitter;
 
-    var game = new Phaser.Game(1000, 1000, Phaser.AUTO, 'phaser-example', {
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
         preload: preload,
         create: create,
         update: update,
@@ -41,7 +41,7 @@
 //        game.load.image('hole', 'assets/sprites/block.png');
         game.load.image('photon', 'assets/mana_small.png');
         game.load.image('mana', 'assets/photon_small.png');
-        game.load.image('line', 'assets/sprites/vu.png');
+        game.load.image('line', 'assets/line.png');
         game.load.image('prism', 'assets/sprites/diamond.png');
         game.load.image('hole', 'assets/blackhole_small.png');
         game.load.image('ray1', 'assets/light_ray/dust_small.png');
@@ -57,25 +57,23 @@
 
     var bmpText;
     var prism;
-
     function create() {
-
-        game.add.tileSprite(-500, -500, 2000, 2000, 'background');
-
         //  Resize our game world to be a 2000 x 2000 square
         game.world.setBounds(-500, -500, 1000, 1000);
 
+        game.add.tileSprite(-500, -500, 1000, 1000, 'background');
+
+
         //  The base of our player
         player = game.add.sprite(0, 0, 'photon');
-
         //  This will force the player to decelerate and limit its speed
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.physics.arcade.enable(player);
         player.body.drag.set(0.2);
         player.body.maxVelocity.setTo(400, 400);
         player.body.collideWorldBounds = true;
-        player.body.allowGravity = true;
-        player.scale.setTo(0.4, 0.4);
+        player.body.allowGravity = false;
+        player.scale.setTo(0.5, 0.5);
         player.anchor.setTo(0.5, 0.5);
 
         /*
@@ -84,23 +82,23 @@
         linex = lineGroup.create(10, 100, 'line');
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
         */
-
-        // Blackhole Group
-        blackholes = game.add.group();
-        blackholes.enableBody = true;
-        game.physics.enable(blackholes, Phaser.Physics.ARCADE);
+//
+//        // Blackhole Group
+//        blackholes = game.add.group();
+//        blackholes.enableBody = true;
+//        game.physics.enable(blackholes, Phaser.Physics.ARCADE);
 
         //createBlackhole(-400, -400, 4);
 
 
+//        game.physics.arcade.checkCollision.left = true;
+//        game.physics.arcade.checkCollision.right = true;
+
         player.bringToTop();
 
         game.camera.follow(player);
-        game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
-        game.camera.focusOnXY(0, 0);
-
-
-
+//        game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+//        game.camera.focusOnXY(0, 0);
 
 
         cursors = game.input.keyboard.createCursorKeys();
@@ -121,7 +119,7 @@
 
         manaGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 2, {threshold: 100}, {mana: manaGroup});
+            game.world.width, game.world.height, 2, {threshold: 200}, {mana: manaGroup});
         game.physics.enable(manaGroup, Phaser.Physics.ARCADE);
         manaGroup.enableBody = true;
         manaGroup.scale.setTo(0.5, 0.5);
@@ -133,8 +131,9 @@
 
         lineGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
-            game.world.width, game.world.height, 1, {threshold: 200}, {line: lineGroup});
+            game.world.width, game.world.height, 2, {threshold: 200}, {line: lineGroup});
         game.physics.enable(lineGroup, Phaser.Physics.ARCADE);
+
 
         blackholesGroup = game.add.group();
         generateObstackleSections(game.world.width / -2, game.world.height / -2,
@@ -161,26 +160,38 @@
     function update() {
 
         rayParticlesUpdate();
-        player.bringToTop();
+        //player.bringToTop();
+        rel_x = game.world.width/player.body.x;
+        rel_y = game.world.height/player.body.y;
+
+        var turn_angle = 5;
+
+        //game.world.anchor.setTo(rel_x,rel_y);
+        if (cursors.left.isDown) {
+            player.angle += -turn_angle;
+
+            //game.world.angle += turn_angle;
+           // game.world.rotation -= 0.01;
+
+
+        }
+        else if (cursors.right.isDown) {
+            player.angle += turn_angle;
+
+            //game.world.angle -= turn_angle;
+            //game.world.rotation += 0.01;
+
+        }
+//        game.camera.x = player.body.x;
+//        game.camera.y = player.body.y;
+
+        // x, y, width, height
+        game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width/2 + game.width / 2,player.body.height/2 + game.height / 2);
+
 
         // update elapsed time
         bmpText.text = 'TIME: ' + Math.round(game.time.now);
 
-        rel_x = game.world.width/player.body.x;
-        rel_y = game.world.height/player.body.y;
-
-        //game.world.anchor.setTo(rel_x,rel_y);
-        if (cursors.left.isDown) {
-            player.angle += -4;
-            //game.world.angle += 4;
-
-        }
-        else if (cursors.right.isDown) {
-            player.angle += 4;
-            //game.world.angle += -4;
-        }
-        game.camera.x = player.x;
-        game.camera.y = player.y;
 
 
 
@@ -198,17 +209,19 @@
         console.log("------------------------");
         */
 
+        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
 
         game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
-
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
         game.physics.arcade.overlap(player, manaGroup, hitmana, null, this);
-        game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
         //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
         game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
         game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
+
+
+
 
 
     }
@@ -239,21 +252,30 @@
     }
 
     function hitLine(player, line) {
-//      player.body.velocity.setTo(-100, -100);
+      //player.body.velocity.setTo(-player.body.velocity.x, -player.body.velocity.y);
         player.angle *= -1.0;
 
-        //line.body.x += Math.floor(Math.random() * 40) - 15;
-        //line.body.y += Math.floor(Math.random() * 40) - 15;
+//        line.body.x += Math.floor(Math.random() * 40) - 15;
+//        line.body.y += Math.floor(Math.random() * 40) - 15;
 
+//        line.body.y += Math.floor(Math.random() * 40) - 15;
 
-        var emitter = game.add.emitter(player.body.x, player.body.y, 2);
+        var particles = 3;
+        emit(player.body.x, player.body.y, particles);
+    }
+
+    function emit(x, y, particles) {
+
+        var emitter = game.add.emitter(x, y, particles);
         emitter.makeParticles('balls', [0, 1, 2, 3, 4, 5]);
         emitter.minParticleSpeed.setTo(-600, -600);
         emitter.maxParticleSpeed.setTo(600, 600);
         emitter.gravity = 0;
-        //emitter.start(false, 400, 15);
+        emitter.start(false, 2000, 1);
 
-
+        setTimeout(function () {
+            emitter.on = false;
+        }, 1000)
     }
 
     function hitmana(player, mana) {
@@ -274,7 +296,6 @@
         player.angle += 20 / coefficient * (-1);
 
         var c = Phaser.Color.getRandomColor(50, 255, 255);
-
 
         setTimeout(function () {
             game.stage.backgroundColor = c;
@@ -311,15 +332,15 @@
         g.x *= cur_gravity;
         g.y *= cur_gravity;
 
-        //console.log(player.body.velocity);
+        console.log(player.body.velocity);
 
         new_x = g.x + player.body.velocity.x;
         new_y = g.y + player.body.velocity.y;
 
 
         player.body.velocity.setTo(new_x, new_y);
-        //console.log(player.body.velocity);
-        //console.log("----------------");
+        console.log(player.body.velocity);
+        console.log("----------------");
     }
     /*
     function createBlackhole(x, y, scale) {
