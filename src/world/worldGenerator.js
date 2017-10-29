@@ -50,17 +50,17 @@ function generateObstacles(type,group,world,amount) {
     for (var i=0;i<amount;i++) {
         var next_rand_x = Math.floor(Math.random() * width);
         var next_rand_y = Math.floor(Math.random() * height);
-        console.log("X: " + next_rand_x + " Y: " + next_rand_y);
+        //console.log("X: " + next_rand_x + " Y: " + next_rand_y);
 
         var element = group.create(next_rand_x,next_rand_y,type);
 
         if (element.width>width - next_rand_x) {
             element.kill();
-            console.log("killed");
+            //console.log("killed");
         }
         if (element.height>height - next_rand_y) {
             element.kill();
-            console.log("killed");
+            //console.log("killed");
         }
     }
 }

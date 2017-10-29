@@ -151,8 +151,6 @@
 
         generateObstacles('prism',prismaGroup,game.world,40);
 
-
-
         game.physics.enable(prismaGroup, Phaser.Physics.ARCADE);
 
         lineGroup = game.add.group();
@@ -167,8 +165,6 @@
         game.physics.enable(blackholesGroup, Phaser.Physics.ARCADE);
 
 
-
-
         player.bringToTop();
 
         // text box
@@ -179,7 +175,6 @@
         bmpText.cameraOffset.setTo(200, 50);
 
         player.body.velocity.setTo(5, 0);
-
 
 
         keyControllerInit(this);
@@ -305,8 +300,8 @@
 
     function update() {
 
-        console.log(player.body.x);
-        console.log(player.body.y);
+        //console.log(player.body.x);
+        //console.log(player.body.y);
 
         // Check for paused
         if (isPaused) { return; }
