@@ -204,16 +204,6 @@
 
             }
         }
-//        game.camera.x = player.body.x;
-//        game.camera.y = player.body.y;
-
-        // x, y, width, height
-        game.camera.bounds.setTo(player.body.x, player.body.y, player.body.width/2 + game.width / 2,player.body.height/2 + game.height / 2);
-
-
-        // update elapsed time
-        bmpText.text = 'TIME: ' + Math.round(game.time.now);
-
 
         function onPressENTER() {
 
@@ -230,11 +220,11 @@
 
         game.physics.arcade.overlap(player, lineGroup, hitLine, null, this);
 
-        game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity);
+        game.physics.arcade.velocityFromRotation(player.rotation, CURRENT_SPEED, player.body.velocity);
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         //game.physics.arcade.overlap(player, circle, hitCircle, null, this);
-        game.physics.arcade.overlap(player, manaGroup, hitmana, null, this);
+        game.physics.arcade.overlap(player, manaGroup, hitMana, null, this);
         //game.physics.arcade.overlap(player, blackholes, hitBlackhole, null, this);
         game.physics.arcade.overlap(player, prismaGroup, hitPrisma, null, this);
         game.physics.arcade.overlap(player, blackholesGroup, hitBlackhole, null, this);
@@ -310,7 +300,10 @@
 
     }
 
+    function hitMana(player, mana) {
 
+        mana.body.gravity.y = 2000;
+    }
 
     function hitLine(player, line) {
       //player.body.velocity.setTo(-player.body.velocity.x, -player.body.velocity.y);
@@ -336,8 +329,8 @@
 
         setTimeout(function () {
             emitter.on = false;
-        }, 1000)
-    }
+        }, 1000);
+
 
         mana.body.gravity.y = 2000;
     }
