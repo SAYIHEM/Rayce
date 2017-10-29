@@ -37,6 +37,8 @@
     var pauseText;
     var prism;
 
+    var menuBackground;
+
     // Keys
     var keyESC;
     var keyENTER;
@@ -85,6 +87,11 @@
 
         // Create Filter
         filterGrey = game.add.filter('Gray');
+
+        // Create MenuBackground sprite
+        menuBackground = game.add.sprite(0, 0, 'menu_background');
+        menuBackground.x = game.width/2 - menuBackground.width;
+        menuBackground.y = game.height/2 - menuBackground.height;
 
 
         //  Resize our game world to be a 2000 x 2000 square
@@ -192,6 +199,8 @@
 
         keyControllerInit(this);
         rayParticlesInit();
+
+        menuBackground.bringToTop();
     }
     function disableDraggableGroup ( g ) {
         g.forEach( makeDraggable )
